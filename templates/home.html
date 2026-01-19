@@ -1,0 +1,28 @@
+{% load static %}
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="page">
+        <div class="container">
+            <h1>ProClinic</h1>
+            <h1>Hospital Management System</h1>
+            <p>Digitizing your health facility operations</p>
+            <a href="{% url 'login' %}" class="start-link">Start Here</a>
+        </div>
+    </div>
+
+</body>
+</html>
+

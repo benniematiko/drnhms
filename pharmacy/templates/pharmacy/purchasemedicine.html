@@ -1,0 +1,244 @@
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<div class="generateBill">
+
+  <div class="topSection">
+    <div class="topRow">
+      <div class="leftTopRow">
+        <div class="billNo">Bill No 1831</div>
+        <div class="caseId">Case ID</div>
+      </div>
+      <div class="rightTop">Date/Time</div>
+    </div>
+  </div>
+
+
+
+  <div class="medicineCategory">
+
+    <div class="medicineInput">
+      Medicine Category*
+      <select>
+        <option>Option</option>
+        <option>A</option>
+        <option>B</option>
+      </select>
+    </div>
+
+    <div class="medicineInput">
+      Medicine Name*
+      <select>
+        <option>Select</option>
+        <option>A</option>
+        <option>B</option>
+      </select>
+    </div>
+
+    <div class="medicineInput">
+      Batch No*
+      <input type="text" />
+    </div>
+
+    <div class="medicineInput">
+      Expiry Date*
+
+      <input
+        type="text"
+        id="invoice-number"
+        name="invoice_number"
+        value="INV-00123"
+        readonly
+      />
+    </div>
+
+    <div class="medicineInput">
+      Quantity * | Available Qty
+
+
+      <div class="quantityAvailable">
+         <div class="medicineQuantity">
+         <input type="text" id="invoice-number" name="invoice_number" value="" />
+        </div>
+        <div class="medicineAvailable">
+          <input type="text" id="invoice-number" name="invoice_number" value="1" readonly />        
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="medicineInput">
+      Sales Price(Kshs) * Tax
+
+      <div class="salesTax">
+
+        <div class="medicineSales">
+          <input
+              type="text"
+              id="invoice-number"
+              name="invoice_number"
+              value="1"
+              readonly
+            />
+        </div>
+
+        <div class="medicineTax">
+          <input
+              type="text" id="invoice-number" name="invoice_number" value="1" readonly />
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="medicineInput">     
+      
+      Amount ( Kshs) *
+      <div class="amountT">
+
+        <div class="medicineAmount">
+          <input type="text" id="invoice-number" ame="invoice_number" value="1" readonly />
+        </div>
+
+        <div class="medicineDeleteRow">
+          <button>X</button>
+        </div>
+
+
+      </div>
+    </div>
+
+    
+
+
+
+  </div>
+
+
+  <div class="medicineAddRow">
+    <div class="addRow">
+      <button>+ Add a Row</button>
+    </div>
+  </div>
+
+  <hr/>
+
+  <div class="medicineHospital">
+
+      <div class="leftHospital">
+
+        <div class="leftHospitalRow">
+
+          <div class="leftHospitalDoctor">
+            Hospital Doctor
+            <input text="text"/>  
+          </div>
+
+          <div class="rightHospitalDoctor">
+            Doctor Name
+            <input text="text"/>   
+          </div>
+
+        </div>  
+        
+        <div class="leftHospitalRowTwo">
+          Note
+
+          <textarea></textarea>
+         </div>
+
+
+      </div>
+
+      <div class="rightHospital">
+
+        <div class="rightHospitalRowOne">
+          <div>
+            Total(Kshs)
+          </div>
+
+          <div>
+            Here.................
+          </div>
+        </div>
+
+
+        <div class="rightHospitalRowTwo">
+          <div>
+            Discounts(Kshs)
+          </div>
+
+          <div>
+            ---------------
+          </div>
+
+          <div>
+            -----------------
+          </div>
+        </div>
+
+
+        <div class="rightHospitalRowThree">
+          <div>
+            Tax(Kshs)
+          </div>
+
+          <div>
+            Here.................
+          </div>
+        </div>
+
+         <div class="rightHospitalRowFour">
+          <div>
+            Net Amount(Kshs)
+          </div>
+
+          <div>
+            Here.................
+          </div>
+        </div>
+
+
+         <div class="rightHospitalRowFive">
+          <div>
+            Payment Mode 
+
+            <select>
+              <option>Cash</option>
+              <option>Cheque</option>
+              <option>MPESA</option>
+
+            </select>
+          </div>
+
+          <div>
+            Payment Amount
+
+            <input type="text" readonly />
+          </div>
+        </div>
+      </div>
+
+
+
+  </div>
+
+
+  <div class="generateBillButtons">
+    <div><button>Save & Print</button></div>
+    <div><button>Save</button></div>
+  </div>
+
+
+
+
+ 
+</div>
+
+
+
+
+
+{% endblock %}

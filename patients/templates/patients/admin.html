@@ -1,0 +1,80 @@
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<div class="mainWrapper">
+  <div><h1>Welcome to the Dashboard, {{ user.username }}!</h1></div>
+  <div>
+    <p>This is your main dashboard where you can access all modules.</p>
+  </div>
+  <div class="dashboardContainer">
+
+
+
+    
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>Patients Served</p>
+          <p>5687</p>
+        </a>
+      </span>
+    </div>
+
+
+   
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>Total Revennue</p>
+          <p>Kshs 5,875,444.00</p>
+        </a>
+      </span>
+    </div>
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>Total Invoices</p>
+          <p>Kshs 5,875,444.00</p>
+        </a>
+      </span>
+    </div>
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>SHA Patients</p>
+          <p>365</p>
+        </a>
+      </span>
+    </div>
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>SHA Collections</p>
+          <p>Kshs 9,8754,658.00</p>
+        </a>
+      </span>
+    </div>
+
+
+    <div class="cardItem">
+      <span>
+        <a href="">
+          <p>SHA Collections</p>
+          <p>Kshs 9,8754,658.00</p>
+        </a>
+      </span>
+    </div>
+
+
+
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,920 @@
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<div class="generateBill">
+  <form id="billForm">
+    {% csrf_token %}
+    <div class="medicineAddPatient">
+      <!-- <div>       
+           <input type="text" id="patientName" name="patient_name" placeholder="Patient Name" />
+
+      </div> -->
+
+      <div class="sectionPatientName">
+        <input
+          type="text"
+          id="patientName"
+          name="patient_name"
+          placeholder="Patient Name"
+          autocomplete="off"
+        />
+        <input type="hidden" id="patientId" name="patient_id" />
+        <div
+          id="patientSuggestions"
+          style="
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          "
+        ></div>
+      </div>
+
+      <div>
+        <button id="openPatientModal" type="button">+ Add Patient</button>
+      </div>
+
+      <div>
+        <input
+          type="text"
+          id="prescriptionNo"
+          name="prescription"
+          placeholder="Prescription No"
+        />
+      </div>
+
+      <div class="generateBillBtnContainer">
+        <a class="generateBillBtnClose" href="{% url 'pharmacy' %}" style="cursor: pointer; text-decoration: none; color: inherit;">
+    ×
+  </a>
+        </div>
+    </div>
+
+    <div class="topSection">
+      <div class="topRow">
+        <div class="leftTopRow">
+          <div class="billNo">Bill No 1831</div>
+          <div class="caseId">Case ID</div>
+        </div>
+        <div class="rightTop">Date/Time</div>
+      </div>
+    </div>
+
+    <div id="medicineRowsContainer">
+      <div class="medicineCategory medicineRow">
+        <div class="medicineInput">
+          <label for="medicinecategory"> Medicine Category*</label>
+          <select class="medicinecategory">
+            <option value="">--Select Category--</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="medicineInput">
+          <label for="medicinename">Medicine Name* </label>
+          <select class="medicinename">
+            <option value="">--Select Medicine--</option>
+          </select>
+        </div>
+
+        <div class="medicineInput">
+          <label for="batchnumber">Batch No*</label>
+          <select class="batchnumber">
+            <option value="">--Select Batch--</option>
+          </select>
+        </div>
+
+        <div class="medicineInput">
+          <label for="expirydate">Expiry Date*</label>
+          <input type="text" name="expirydate" class="expirydate" readonly />
+        </div>
+
+        <div class="medicineInput">
+          <div class="quantityAvailable">
+            <div class="medicineQuantity">
+              <label for="available_qty">Quantity *</label>
+              <input type="text" class="medicinequantity" />
+            </div>
+
+            <div class="medicineAvailable">
+              <label for="availableqty">Available Qty*</label>
+              <input type="text" class="availableqty" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="medicineInput">
+          <div class="salesTax">
+            <div class="medicineSales">
+              <label for="medicinesalesprice">Sales Price*</label>
+              <input type="text" class="medicinesalesprice" readonly />
+            </div>
+
+            <div class="medicineTax">
+              <label for="salestax">Tax*</label>
+              <input type="text" class="medicinetax" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="medicineInput">
+          <div class="amountT">
+            <div class="medicineAmount">
+              <label for="medicineamount">Amount ( Kshs) *</label>
+              <input type="text" class="medicineamount" readonly />
+            </div>
+
+            <div class="medicineDeleteRow">
+              <button type="button" class="deleteRowBtn">X</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="medicineAddRow">
+      <div class="addRow">
+        <button type="button" id="addRowBtn">+ Add a Row</button>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- Left side of generatebill  -->
+
+    <div class="sectionDoctorTotals">
+      <div class="sectionDoctorLeft">
+        <div class="SectionDoctorRowOne">
+          <div class="sectionHospitalDoctor">
+            <label>Hospital Doctor Name *</label>
+            <select name="hospital_doctor" id="hospital_doctor">
+              <option value="">--Select Hospital Doctor--</option>
+              {% for doctor in doctors %}
+              <option value="{{ doctor.id }}">
+                Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="sectionExternalDoctor">
+            <label>Doctor Name (External) *</label>
+            <select name="doctor_name" id="doctor_name">
+              <option value="">--Select Doctor--</option>
+              {% for doctor in doctors %}
+              <option value="{{ doctor.id }}">
+                Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="SectionDoctorRowTwo">
+          <div>Note</div>
+          <textarea name="note" id="note"></textarea>
+        </div>
+      </div>
+
+      <div class="sectionDoctorRight">
+        <div class="sectionTotalsRowOne">
+          <div>Total ( Kshs )</div>
+
+          <div>
+            <input
+              type="number"
+              id="totalAmount"
+              name="total_amount"
+              placeholder="0"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="sectionTotalsRowTwo">
+          <div>Discount (Kshs)</div>
+          <div>
+            <input
+              type="number"
+              id="discountPercent"
+              name="discount_percent"
+              placeholder="Discount(%)"
+            />
+          </div>
+
+          <div>
+            <input
+              type="number"
+              id="discountAmount"
+              name="discount_amount"
+              placeholder="0"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="sectionTotalsRowThree">
+          <div>Tax(%)</div>
+
+          <div>
+            <input
+              type="number"
+              id="taxAmount"
+              name="tax_amount"
+              placeholder="0"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="sectionTotalsRowFour">
+          <div>Net Amount</div>
+
+          <div>
+            <input
+              type="number"
+              id="netAmount"
+              name="net_amount"
+              placeholder="0"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="sectionTotalsRowFive">
+          <div>
+            <div>Payment Mode:</div>
+
+            <select id="paymentMode" name="payment_mode">
+              <option value="">--Select Payment Mode--</option>
+              <option value="CASH">Cash</option>
+              <option value="CHEQUE">Cash</option>
+              <option value="CARD">Card</option>
+              <option value="TRANSFER">Bank Transfer</option>
+              <option value="UPI">UPI</option>
+              <option value="ONLINE">Online</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+
+          <!-- In the payment section, update the amount input: -->
+          <div>
+            Amount*
+            <input
+              type="number"
+              name="payment_amount"
+              id="paymentAmount"
+              placeholder="0"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="generateBillButtons">
+      <div><button>Save & Print</button></div>
+      <div>
+        <button id="saveBillBtn" type="button">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Add a row -->
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("medicineRowsContainer");
+    const addRowBtn = document.getElementById("addRowBtn");
+
+    // 1. INITIALIZE THE FIRST ROW
+    const firstRow = document.querySelector(".medicineRow");
+    if (firstRow) {
+      initializeRow(firstRow);
+    }
+
+    // 2. ADD ROW FUNCTIONALITY
+    addRowBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const templateRow = document.querySelector(".medicineRow");
+      const newRow = templateRow.cloneNode(true);
+
+      newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+      newRow.querySelectorAll("select").forEach((select) => {
+        select.selectedIndex = 0;
+        if (select.classList.contains("medicinename")) {
+          select.innerHTML = '<option value="">--Select Medicine--</option>';
+        }
+        if (select.classList.contains("batchnumber")) {
+          select.innerHTML = '<option value="">--Select Batch--</option>';
+        }
+      });
+
+      container.appendChild(newRow);
+      initializeRow(newRow);
+      updateGrandTotal();
+    });
+
+    // 3. DELETE ROW
+    container.addEventListener("click", function (e) {
+      if (e.target.classList.contains("deleteRowBtn")) {
+        e.preventDefault();
+        const rows = document.querySelectorAll(".medicineRow");
+        if (rows.length > 1) {
+          e.target.closest(".medicineRow").remove();
+          updateGrandTotal();
+        } else {
+          alert("Cannot delete the last row!");
+        }
+      }
+    });
+
+    // 4. ROW INITIALIZATION LOGIC
+    function initializeRow(row) {
+      const categorySelect = row.querySelector(".medicinecategory");
+      const medicineSelect = row.querySelector(".medicinename");
+      const batchSelect = row.querySelector(".batchnumber");
+      const quantityInput = row.querySelector(".medicinequantity");
+      const availableQtyInput = row.querySelector(".availableqty");
+
+      categorySelect.addEventListener("change", function () {
+        const categoryId = this.value;
+        medicineSelect.innerHTML =
+          '<option value="">--Select Medicine--</option>';
+        batchSelect.innerHTML = '<option value="">--Select Batch--</option>';
+        clearBatchDetails(row);
+        if (categoryId) {
+          fetch("{% url 'get_medicines' %}?category_id=" + categoryId)
+            .then((res) => res.json())
+            .then((data) => {
+              if (!data.medicines || data.medicines.length === 0) {
+                alert("No drugs in this category!");
+                return;
+              }
+              data.medicines.forEach((med) => {
+                  medicineSelect.add(new Option(med.name, med.id));  // ✅ Correct - storing ID as value
+
+              });
+            });
+        }
+      });
+
+      medicineSelect.addEventListener("change", function () {
+        const medName = this.value;
+        batchSelect.innerHTML = '<option value="">--Select Batch--</option>';
+        clearBatchDetails(row);
+        if (medName) {
+          fetch(
+            "{% url 'get_batches' %}?medicine_name=" +
+              encodeURIComponent(medName),
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              data.batches.forEach((batch) => {
+                const opt = new Option(`${batch.batch_number}`, batch.id);
+                opt.dataset.expiryDate = batch.expiry_date;
+                opt.dataset.availableQty = batch.stock_quantity;
+                opt.dataset.salesPrice = batch.unit_price;
+                batchSelect.add(opt);
+              });
+            });
+        }
+      });
+
+      batchSelect.addEventListener("change", function () {
+        const opt = this.options[this.selectedIndex];
+        if (this.value) {
+          row.querySelector(".expirydate").value = opt.dataset.expiryDate || "";
+          availableQtyInput.value = opt.dataset.availableQty || "";
+          row.querySelector(".medicinesalesprice").value =
+            opt.dataset.salesPrice || "";
+          const price = parseFloat(opt.dataset.salesPrice) || 0;
+          row.querySelector(".medicinetax").value = (price * 0.16).toFixed(2);
+          calculateAmount(row);
+        } else {
+          clearBatchDetails(row);
+        }
+      });
+
+      quantityInput.addEventListener("input", function () {
+        const enteredQty = parseFloat(this.value) || 0;
+        const availableQty = parseFloat(availableQtyInput.value) || 0;
+        if (enteredQty > availableQty) {
+          alert(`Insufficient Stock! Only ${availableQty} available.`);
+          this.value = availableQty;
+        }
+        calculateAmount(row);
+        updateGrandTotal();
+      });
+    }
+
+    // 5. CALCULATION HELPERS
+    function calculateAmount(row) {
+      const qty = parseFloat(row.querySelector(".medicinequantity").value) || 0;
+      const price =
+        parseFloat(row.querySelector(".medicinesalesprice").value) || 0;
+      const tax = parseFloat(row.querySelector(".medicinetax").value) || 0;
+      const total = qty * price + qty * tax;
+      row.querySelector(".medicineamount").value =
+        total > 0 ? total.toFixed(2) : "";
+    }
+
+    function clearBatchDetails(row) {
+      row
+        .querySelectorAll(
+          ".expirydate, .availableqty, .medicinesalesprice, .medicinetax, .medicineamount, .medicinequantity",
+        )
+        .forEach((i) => (i.value = ""));
+      updateGrandTotal();
+    }
+
+    // MERGED UPDATE GRAND TOTAL
+    function updateGrandTotal() {
+      let grandTotal = 0;
+      document.querySelectorAll(".medicineRow").forEach((row) => {
+        const amt = parseFloat(row.querySelector(".medicineamount").value) || 0;
+        grandTotal += amt;
+      });
+
+      const totalInput = document.querySelector(".sectionTotalsRowOne input");
+      if (totalInput) {
+        totalInput.value = grandTotal.toFixed(2);
+        // This triggers Section 6 automatically
+        totalInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    // 6. DISCOUNT & NET TOTAL CALCULATION (Inside Listener)
+    const sectionDoctorRight = document.querySelector(".sectionDoctorRight");
+    sectionDoctorRight.addEventListener("input", function () {
+      const totalVal =
+        parseFloat(
+          document.querySelector(".sectionTotalsRowOne input").value,
+        ) || 0;
+      const discPercent =
+        parseFloat(
+          document.querySelector(".sectionTotalsRowTwo div:nth-child(2) input")
+            .value,
+        ) || 0;
+      const discAmountField = document.querySelector(
+        ".sectionTotalsRowTwo div:nth-child(3) input",
+      );
+      const taxPercent =
+        parseFloat(
+          document.querySelector(".sectionTotalsRowThree input").value,
+        ) || 0;
+      const netAmountField = document.querySelector(
+        ".sectionTotalsRowFour input",
+      );
+      const finalPaymentField = document.querySelector(
+        ".sectionTotalsRowFive input",
+      );
+
+      const discAmount = totalVal * (discPercent / 100);
+      discAmountField.value = discAmount.toFixed(2);
+
+      const subtotal = totalVal - discAmount;
+      const taxAmount = subtotal * (taxPercent / 100);
+      const netAmount = subtotal + taxAmount;
+
+      netAmountField.value = netAmount.toFixed(2);
+      finalPaymentField.value = netAmount.toFixed(2);
+    });
+
+    // SAVE TO DATABASE
+
+    document
+      .getElementById("saveBillBtn")
+      .addEventListener("click", function (e) {
+        e.preventDefault();
+
+        // Helper function to safely get element value
+        function getElementValue(id, defaultValue = "") {
+          const element = document.getElementById(id);
+          if (!element) {
+            console.warn(`Element with id '${id}' not found`);
+            return defaultValue;
+          }
+          return element.value || defaultValue;
+        }
+
+        function getElementFloat(id, defaultValue = 0) {
+          const value = getElementValue(id, "0");
+          return parseFloat(value) || defaultValue;
+        }
+
+        // Collect medicine rows data
+        const medicineRows = [];
+        let isValid = true;
+
+        document.querySelectorAll(".medicineRow").forEach((row, index) => {
+          const drugSelect = row.querySelector(".medicinename");
+          const batchSelect = row.querySelector(".batchnumber");
+          const quantityInput = row.querySelector(".medicinequantity");
+          const unitPriceInput = row.querySelector(".medicinesalesprice");
+          const amountInput = row.querySelector(".medicineamount");
+          const availableQtyInput = row.querySelector(".availableqty");
+
+          if (!drugSelect || !quantityInput || !unitPriceInput) {
+            console.warn(`Row ${index + 1}: Missing required elements`);
+            return;
+          }
+
+          const quantity = parseInt(quantityInput.value) || 0;
+          const unitPrice = parseFloat(unitPriceInput.value) || 0;
+          const availableQty = availableQtyInput
+            ? parseInt(availableQtyInput.value) || 0
+            : 0;
+
+          if (drugSelect.value && quantity > 0) {
+            // Validate quantity against available stock
+            if (availableQty > 0 && quantity > availableQty) {
+              alert(
+                `Row ${
+                  index + 1
+                }: Quantity (${quantity}) exceeds available stock (${availableQty})`,
+              );
+              isValid = false;
+              return;
+            }
+
+            medicineRows.push({
+              drug_id: parseInt(drugSelect.value),
+              batch_number: batchSelect ? batchSelect.value : "",
+              quantity: quantity,
+              unit_price: unitPrice,
+              line_total: amountInput
+                ? parseFloat(amountInput.value) || 0
+                : quantity * unitPrice,
+            });
+          }
+        });
+
+        if (!isValid) return;
+
+        // Validate that we have at least one medicine
+        if (medicineRows.length === 0) {
+          alert("Please add at least one medicine to the bill");
+          return;
+        }
+
+        // Collect form data with null checks
+        const formData = {
+          patient_id:
+            getElementValue("patientId") || getElementValue("patientName"),
+          prescription_no: getElementValue("prescriptionNo"),
+          hospital_doctor: getElementValue("hospital_doctor"),
+          external_doctor: getElementValue("doctor_name"),
+          total_amount: getElementFloat("totalAmount"),
+          discount_percent: getElementFloat("discountPercent"),
+          discount_amount: getElementFloat("discountAmount"),
+          tax_amount: getElementFloat("taxAmount"),
+          net_amount: getElementFloat("netAmount"),
+          payment_mode: getElementValue("paymentMode"),
+          payment_amount: getElementFloat("paymentAmount"),
+          note: getElementValue("note"),
+          invoice_items: medicineRows,
+        };
+
+        // Validate required fields
+        if (!formData.patient_id) {
+          alert("Please select a patient");
+          return;
+        }
+
+        if (!formData.hospital_doctor && !formData.external_doctor) {
+          alert("Please select a doctor");
+          return;
+        }
+
+        // Get CSRF token
+        const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
+        if (!csrfInput) {
+          alert("Security token not found. Please refresh the page.");
+          return;
+        }
+        const csrftoken = csrfInput.value;
+
+        // Disable button to prevent double submission
+        const saveBtn = document.getElementById("saveBillBtn");
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.textContent = "Saving...";
+        }
+
+        // Send data to backend
+        fetch("/billing/save/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.success) {
+              alert(
+                "Bill saved successfully! Invoice Number: " +
+                  data.invoice_number,
+              );
+              // Redirect or reset form
+              // window.location.href = `/billing/invoice/${data.invoice_id}/`;
+              // OR reset the form:
+              document.getElementById("billForm").reset();
+              location.reload(); // Refresh the page
+            } else {
+              alert("Error saving bill: " + (data.error || "Unknown error"));
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while saving the bill: " + error.message);
+          })
+          .finally(() => {
+            // Re-enable button
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.textContent = "Save";
+            }
+          });
+      });
+
+    
+    
+    // Patient autocomplete code when I type a few characters in the generatebill.html
+
+    const patientInput = document.getElementById("patientName");
+    const patientIdInput = document.getElementById("patientId");
+    const suggestionsDiv = document.getElementById("patientSuggestions");
+    let debounceTimer;
+
+    patientInput.addEventListener("input", function () {
+      clearTimeout(debounceTimer);
+      const query = this.value.trim();
+
+      if (query.length < 2) {
+        suggestionsDiv.style.display = "none";
+        return;
+      }
+
+      debounceTimer = setTimeout(() => {
+        fetch(`/pharmacy/get-patients/?q=${encodeURIComponent(query)}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.length > 0) {
+              suggestionsDiv.innerHTML = data
+                .map(
+                  (patient) => `
+                            <div class="patient-suggestion" 
+                                 data-id="${patient.id}" 
+                                 data-name="${patient.name}"
+                                 style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;">
+                                <strong>${patient.name}</strong> 
+                                <span style="color: #666;">(${patient.hospital_number})</span>
+                            </div>
+                        `,
+                )
+                .join("");
+              suggestionsDiv.style.display = "block";
+
+              document
+                .querySelectorAll(".patient-suggestion")
+                .forEach((item) => {
+                  item.addEventListener("click", function () {
+                    patientInput.value = this.dataset.name;
+                    patientIdInput.value = this.dataset.id;
+                    suggestionsDiv.style.display = "none";
+                  });
+
+                  item.addEventListener("mouseenter", function () {
+                    this.style.backgroundColor = "#f0f0f0";
+                  });
+
+                  item.addEventListener("mouseleave", function () {
+                    this.style.backgroundColor = "white";
+                  });
+                });
+            } else {
+              suggestionsDiv.innerHTML =
+                '<div style="padding: 10px; color: #999;">No patients found</div>';
+              suggestionsDiv.style.display = "block";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching patients:", error);
+          });
+      }, 300);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (e.target !== patientInput && e.target !== suggestionsDiv) {
+        suggestionsDiv.style.display = "none";
+      }
+    });
+
+    // pop up modal & selecting patient name on the generatebill.html
+
+    const modal = document.getElementById("patientModal");
+    const btn = document.getElementById("openPatientModal");
+    const closeBtn = document.querySelector(".close-modal");
+    const cancelBtn = document.querySelector(".btn-cancel");
+
+    //   Open the modal
+    btn.onclick = function (e) {
+      e.preventDefault(); // Stop form submission
+      modal.style.display = "block";
+    };
+
+    //   Close the modal (clicking X or Cancel)
+    const closeModal = () => (modal.style.display = "none");
+
+    closeBtn.onclick = closeModal;
+    cancelBtn.onclick = closeModal;
+
+    // Close if user clicks outside the white box
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        closeModal();
+      }
+    };
+  });
+
+</script>
+
+<!-- Add Patient floating page  -->
+
+<div id="patientModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add New Patient</h3>
+      <span class="close-modal">&times;</span>
+    </div>
+
+    <form id="addPatientForm">
+      <div class="modal-body">
+        <div class="patientNames">
+          <div class="patientFullName">
+            <label>Patient's Full Name</label>
+            <input type="text" placeholder="Enter patient's full name" />
+          </div>
+
+          <div class="guardianFullName">
+            <label>Guardian's Full Names</label>
+            <input type="text" placeholder="Enter guardian's full name" />
+          </div>
+        </div>
+
+        <div class="genderRow">
+          <div class="patientGender">
+            <div>Gender</div>
+            <select>
+              <option>--Select gender--</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+
+          <div class="patientdateOfBirth">
+            <div>Date of Birth</div>
+            <input type="date" />
+          </div>
+
+          <div class="patientAge">
+            <div>Age (yy-mm-dd) *</div>
+            <div>
+              <div><input type="text" placeholder="Age" /></div>
+              <div><input type="text" placeholder="Month" /></div>
+              <div><input type="text" placeholder="Day" /></div>
+            </div>
+          </div>
+
+          <div class="patientBloodGroup">
+            <div>Blood Group</div>
+            <div>
+              <select>
+                <option>--Select Blood Group</option>
+                <option>O+</option>
+                <option>A+</option>
+                <option>B+</option>
+                <option>AB+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="patientMaritalStatus">
+            <div>Marital Status</div>
+            <div>
+              <select>
+                <option>--Select Marita Status</option>
+                <option>Single</option>
+                <option>Married</option>
+                <option>Widow</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="patientPhoto">
+            <div>Patient's Photo</div>
+            <input type="text" placeholder />
+          </div>
+        </div>
+
+        <div class="patientPhone">
+          <div class="patientPhoneInput">
+            <div>Phone</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+
+          <div class="patientEMailInput">
+            <div>Email</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+
+          <div class="patientAddressInput">
+            <div>Address</div>
+            <div><input type="text" /></div>
+          </div>
+        </div>
+
+        <div class="patientRemarks">
+          <div>
+            <div>Remarks</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+
+          <div>
+            <div>Any known allergies</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="patientInsurance">
+          <div>
+            <div>
+              <div>Insurance</div>
+              <select>
+                <option>--Select Insurance--</option>
+                <option>SHA</option>
+                <option>Jubilee Medical</option>
+                <option>CIC Insurance</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <div>Insurance Id</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+
+          <div>
+            <div>Insurance Validity</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="patientIdentification">
+          <div>
+            <div>National Identification Number</div>
+            <div>
+              <input type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel">Cancel</button>
+          <button type="submit" class="btn-save">Save Patient</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

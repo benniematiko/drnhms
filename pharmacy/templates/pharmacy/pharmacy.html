@@ -1,0 +1,116 @@
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<aside class="sidebar">
+  <ul>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Billing</a></li>
+    <li><a href="#">Appointments</a></li>
+    <li><a href="#">OPD - Out Patient</a></li>
+    <li><a href="#">IPD - In Patient</a></li>
+    <li><a href="#">Pharmacy</a></li>
+    <li><a href="#">Laboratory</a></li>
+    <li><a href="#">Radiology</a></li>
+    <li><a href="#">Blood Bank</a></li>
+    <li><a href="#">Ambulance</a></li>
+    <li><a href="#">Front Office</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+  <div class="pharmacy">
+    <div class="pharmacyheader">
+      <div><h1>Pharmacy BillS</h1></div>
+      <div>
+        <a href="{% url 'generatebill' %}"> <button>+Generate a Bill</button> </a>
+        <a href=""><button>Medicines</button></a>
+      </div>
+    </div>
+
+    <div class="pharmacysearch">
+      <div>Search drug</div>
+
+      <div>
+        <select>
+          <option>20</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+        <span><button>Excel</button></span>
+        <span><button>CSV</button></span>
+        <span><button>PDF</button></span>
+        <span><button>Print</button></span>
+      </div>
+    </div>
+
+    <div class="pharmacytable">
+      <!-- Display data  -->
+
+      <table class="billingtable">
+        <thead>
+          <tr>
+            <th>Bill No</th>
+            <th>Case ID</th>
+            <th>Date</th>
+            <th>Patient Name</th>
+            <th>Doctor Name</th>
+            <th>Discount (Kshs)</th>
+            <th>Net Amount (Kshs)</th>
+            <th>Paid Amount (Kshs)</th>
+            <th>Refund Amount (Kshs)</th>
+            <th>Balance Amount (Kshs)</th>
+          </tr>
+        </thead>
+        <tbody>
+         
+          {% for invoice in invoices %}
+          <tr>
+            <td>{{ invoice.invoice_number }}</td>
+            <td>{{ invoice.patient.case_id }}</td>
+            <td>{{ invoice.created_at|date:"Y-m-d" }}</td>      
+
+            <td>{{ invoice.patient.first_name }} {{ invoice.patient.last_name }}</td>
+            <!-- <td>{{ invoice.doctor.first_name }} {{ invoice.doctor.last_name }}</td> -->
+             <td>
+                {% if invoice.doctor %}
+                  {{ invoice.doctor.first_name }} {{ invoice.doctor.last_name }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+
+            <td>{{ invoice.discount_amount|floatformat:2 }}</td>
+            <td>{{ invoice.net_amount|floatformat:2 }}</td>
+            <td>{{ invoice.paid_amount|floatformat:2 }}</td>
+            <!-- <td>{{ invoice.refund_amount|floatformat:2 }}</td> -->
+
+            <td class="{% if invoice.refund_amount > 0 %}text-success{% endif %}">
+              {{ invoice.refund_amount|floatformat:2 }}
+            </td>
+
+
+            <!-- <td>{{ invoice.balance_amount }|floatformat:2}</td> -->
+             <td class="{% if invoice.balance_amount > 0 %}text-danger{% endif %}">
+              {{ invoice.balance_amount|floatformat:2 }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td>
+              No pharmacy invoices found.
+            </td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pharmacypagination">
+      <div class="">Records: 1 to 100 of 1,781</div>
+      <div class=""><1, 2,......18 ></div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

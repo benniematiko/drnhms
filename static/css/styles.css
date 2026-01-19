@@ -1,0 +1,1093 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  height: 100%;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow: auto;
+  background: #f0f2f5;
+}
+
+/* 
+  Home Page 
+  Full viewport grid */
+.page {
+  height: 100%;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Content styling */
+.container {
+  text-align: center;
+}
+
+.start-link {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+/******************
+  +++++++++++++++
+  
+    Dashboard
+
+  +++++++++++++++
+ ******************/
+
+.grid {
+  display: grid;
+  grid-template-columns: 14% 1fr; /* sidebar + content */
+  grid-template-rows: auto 1fr auto; /* header + content + footer */
+  grid-template-areas:
+    "header header"
+    "sidebar content"
+    "footer footer";
+
+  min-height: 100vh;
+}
+
+.header {
+  grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  background-color: #2c3e50;
+  color: #f0f0f0;
+  padding: 20px;
+}
+
+.logo a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.welcome {
+  margin: 0px 18px 0 18px;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background: #e0e0e0;
+  padding: 10px;
+}
+.content {
+  grid-area: content;
+  background: #fff;
+  padding: 10px;
+  padding: 0;
+}
+.footer {
+  grid-area: footer;
+  background: #f0f0f0;
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "content"
+      "footer";
+  }
+}
+
+/* Dashboard Cards container */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* Card style */
+.card {
+  background: #ffffff;
+
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* .card h4 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+} */
+
+/* .card p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #3498db;
+} */
+
+/******************
+  +++++++++++++++
+  
+    Pharmacy
+
+  +++++++++++++++
+ ******************/
+.pharmacy {
+  background: rgb(187, 241, 245);
+}
+.pharmacyheader {
+  width: 99%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pharmacysearch {
+  width: 99%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.billingtable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-size: 0.8rem;
+}
+
+.billing-table thead {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+.billing-table th,
+.billing-table td {
+  /* padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb; */
+
+  border: 1px solid #ccc; /* light gray border around each cell */
+  padding: 6px 8px; /* some spacing inside cells */
+  font-size: 12px; /* smaller font if desired */
+  text-align: left; /* optional alignment */
+}
+
+.billing-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.billing-table th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pharmacypagination {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+/*+++++++++++++++++++ 
+    Generatebill Page 
++++++++++++++++++++++++*/
+
+
+
+.generateBill {
+  grid-column: 1 / -1; /* span full grid width */
+  width: 98%;
+  margin: 0 auto;
+  position: relative; /* for absolute positioning */
+  padding-bottom: 60px; /* space for buttons at the bottom */
+  background-color: #ffffff;
+}
+
+
+.medicineAddPatient {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  
+  padding: 12px 0;
+  background-color: #e7d9d9;  
+}
+
+
+
+
+.topSection {
+  width: 100%;
+  padding: 14px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between; /* left group | right */
+  align-items: center;
+}
+
+.leftTopRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Individual items */
+.billNo {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.caseId {
+  font-weight: 500;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.rightTop {
+  font-weight: 500;
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+
+.medicineCategory {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(160px, 1fr));
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+}
+
+/* Input container */
+.medicineInput {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Inputs & selects */
+.medicineInput input,
+.medicineInput select {
+  height: 34px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+/* Two inputs side by side */
+.twoInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+/* Readonly style */
+.medicineInput input[readonly] {
+  background: #f3f4f6;
+}
+/* Readonly style */
+.medicineInput input[readonly] {
+  background: #f3f4f6;
+}
+
+
+
+.quantityAvailable, .salesTax, .amountT {
+  display: flex;
+  align-items: center;
+  gap: 8px;              /* space between inputs */
+  width: 100%;
+}
+
+.medicineQuantity,.medicineAvailable, .medicineSales, .medicineTax {
+  flex: 1;               /* equal width */
+}
+
+.quantityAvailable input {
+  width: 100%;
+  height: 34px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.salesTax input, .amountT input {
+  width: 100%;
+  height: 34px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+/* Readonly styling */
+.medicineAvailable input {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+
+/* Readonly styling */
+.medicineTax input {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+
+/* Readonly styling */
+.medicineAmount input {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* add row */
+
+.medicineAddRow {
+  display: grid;
+  grid-template-columns:1fr;
+  
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+}
+
+/* hospital & doctor details */
+
+
+.medicineHospital {
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+ 
+}
+ 
+
+/* two rows left */
+
+.leftHospital {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space between the two rows */
+  width: 100%;
+}
+
+/* First row: two inputs side by side */
+.leftHospitalRow {
+  display: flex;
+  gap: 12px; /* space between inputs */
+}
+
+.leftHospitalRow > div {
+  flex: 1; /* equal width */
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.leftHospitalRow input {
+  width: 100%;
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+/* Second row: full-width textarea */
+.leftHospitalRowTwo {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.leftHospitalRowTwo textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+/* five rows on the right side  */
+
+.rightHospital {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* spacing between rows */
+  width: 100%;
+}
+
+/* General row style */
+.rightHospital > div {
+  display: flex;
+  gap: 12px; /* spacing between columns */
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* For rows with 2 columns */
+/* .rightHospitalRowOne,
+.rightHospitalRowThree,
+.rightHospitalRowFour {
+  Two equal columns *
+} */
+
+.rightHospitalRowOne div,
+.rightHospitalRowThree div,
+.rightHospitalRowFour div {
+  flex: 1;
+}
+
+/* For row with 3 columns */
+.rightHospitalRowTwo {
+  display: flex;
+  gap: 12px;
+}
+
+.rightHospitalRowTwo > div {
+  flex: 1;
+}
+
+/* Row with select + input */
+.rightHospitalRowFive > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rightHospitalRowFive select,
+.rightHospitalRowFive input {
+  width: 100%;
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+/* Readonly styling */
+.rightHospitalRowFive input[readonly] {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Buttons container */
+.generateBillButtons {
+  position: absolute;   /* stick to bottom of container */
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 12px;            /* space between buttons */
+}
+
+
+/* Button styling */
+.generateBillButtons button {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  background-color: #770905;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.generateBillButtons button:hover {
+  background-color: #9e1604;
+}
+
+
+
+.sectionDoctorTotals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%; /* Force it to fill the parent */
+  max-width: none; /* Ensure nothing is capping the width */
+  gap: 40px;
+  padding: 20px 0px;
+  box-sizing: border-box;
+}
+
+.sectionPatientName{
+  position: relative;
+    
+}
+
+.sectionPatientName input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    /* cursor: pointer; */
+    margin-left:6px;
+}
+
+.generateBillBtnContainer {
+  color:#f44336;
+  font-size: 26px;
+  text-decoration: none;
+  font-weight: bold;
+  
+}
+
+
+.close-btn:hover {
+  color: darkred;
+}
+
+
+/* .sectionDoctorLeft {
+    display: grid;
+    grid-template-columns: 1fr 1fr; Two equal columns 
+    gap: 20px; Space between the columns 
+    margin-bottom: 20px;
+} */
+
+
+
+/* Container for both rows */
+.sectionDoctorLeft {
+  display: flex;
+  flex-direction: column; /* Stacks children vertically */
+  gap: 20px;              /* Consistent vertical spacing between RowOne and RowTwo */
+  width: 100%;
+}
+
+.SectionDoctorRowOne {
+  display: grid;
+  /* Split into 2 equal columns using the fractional unit */
+  grid-template-columns: 1fr 1fr; 
+  /* Space between the two dropdowns */
+  gap: 20px; 
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Ensure individual containers stack their labels and selects */
+.sectionHospitalDoctor, 
+.sectionExternalDoctor {
+  display: flex;
+  flex-direction: column;
+}
+
+.SectionDoctorRowOne label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #374151;
+}
+
+.SectionDoctorRowOne select {
+  width: 100%;
+  height: 38px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+
+
+
+
+
+.sectionDoctorLeft {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between the columns */
+    margin-bottom: 20px;
+}
+
+.sectionHospitalDoctor,
+.sectionExternalDoctor {
+    display: flex;
+    flex-direction: column;
+}
+
+.sectionHospitalDoctor label,
+.sectionExternalDoctor label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.sectionHospitalDoctor select,
+.sectionExternalDoctor select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.sectionHospitalDoctor select:focus,
+.sectionExternalDoctor select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+/* Responsive: Stack vertically on smaller screens */
+@media (max-width: 768px) {
+    .sectionDoctorLeft {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+}
+
+.sectionDoctorRight {
+  width: 100%;
+     display: flex; 
+     flex-direction: column;    
+    gap:15px;
+   
+}
+
+
+
+
+.sectionTotalsRowOne {
+  display: flex;         /* Aligns children horizontally */
+  width: 100%;           /* Ensures container takes full width */
+  gap: 20px;             /* Adds space between the columns */
+}
+
+.sectionTotalsRowOne > div {
+  flex: 1;               /* Forces both divs to take up equal space */
+}
+
+.sectionTotalsRowOne input {
+  width: 100%;           /* Forces the input to fill its parent div */
+  box-sizing: border-box; /* Prevents padding from breaking the width */
+  padding: 10px;
+}
+
+/* Row two */
+.sectionTotalsRowTwo {
+  display: grid;
+  /* Creates 3 columns, each taking 1 equal fraction of space */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 15px; /* Adjust the spacing between the inputs */
+  width: 100%;
+}
+
+.sectionTotalsRowTwo div {
+  width: 100%;
+}
+
+.sectionTotalsRowTwo input {
+  width: 100%;
+  box-sizing: border-box; /* Crucial so padding doesn't break the layout */
+  padding: 8px;
+}
+
+
+/* Row three */
+.sectionTotalsRowThree {
+  display: grid;
+  /* Creates 3 columns, each taking 1 equal fraction of space */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px; /* Adjust the spacing between the inputs */
+  width: 100%;
+}
+
+.sectionTotalsRowThree div {
+  width: 100%;
+}
+
+.sectionTotalsRowThree input {
+  width: 100%;
+  box-sizing: border-box; /* Crucial so padding doesn't break the layout */
+  padding: 8px;
+}
+
+
+/* Row three */
+.sectionTotalsRowFour {
+  display: grid;
+  /* Creates 3 columns, each taking 1 equal fraction of space */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px; /* Adjust the spacing between the inputs */
+  width: 100%;
+}
+
+.sectionTotalsRowFour div {
+  width: 100%;
+}
+
+.sectionTotalsRowFour input {
+  width: 100%;
+  box-sizing: border-box; /* Crucial so padding doesn't break the layout */
+  padding: 8px;
+}
+
+/* Row Five */
+.sectionTotalsRowFive {
+  display: grid;
+  /* Creates 3 columns, each taking 1 equal fraction of space */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px; /* Adjust the spacing between the inputs */
+  width: 100%;
+}
+
+.sectionTotalsRowFive div {
+  width: 100%;
+}
+
+.sectionTotalsRowFive input {
+  width: 100%;
+  box-sizing: border-box; /* Crucial so padding doesn't break the layout */
+  padding: 8px;
+}
+
+
+/* Gray out readonly fields to look like they are automatic */
+input[readonly] {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  border: 1px solid #dee2e6;
+}
+
+
+/* Add Patient Pop Up Page */
+
+/* Hide modal by default */
+.modal-overlay {
+  display: none; 
+  position: fixed;
+  z-index: 9999; /* Sit on top of everything */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5); /* Dimmed background */
+}
+
+/* The actual white box */
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 86%;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+
+
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0;
+}
+
+.close-modal {
+  cursor: pointer;
+  font-size: 24px;
+}
+
+
+
+
+.patientNames {
+  display: flex;
+  gap: 10px;
+}
+
+.patientFullName,
+.guardianFullName {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* equal width */
+}
+
+.patientFullName label,
+.guardianFullName label {
+  margin-bottom: 3px;
+  font-size: 12px;
+  
+}
+
+.patientFullName input,
+.guardianFullName input {
+  padding: 8px;
+  font-size: 12px;
+}
+
+
+
+
+
+@media (max-width: 600px) {
+  .patientNames {
+    flex-direction: column;
+  }
+}
+
+/* Gender row */
+
+.genderRow {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  flex-wrap: wrap; /* allows wrapping on smaller screens */
+}
+
+/* Each field container */
+.genderRow > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+
+/* Inputs & selects */
+.genderRow input,
+.genderRow select {
+  padding: 8px;
+  font-size: 12px;
+  width: 100%;
+}
+
+/* Age fields in one row */
+.patientAge > div {
+  display: flex;
+  gap: 5px;
+}
+
+.patientAge input {
+  flex: 1;
+  text-align: center;
+}
+
+/* Photo field */
+.patientPhoto input {
+  cursor: pointer;
+}
+
+/* Labels */
+.genderRow > div > div:first-child {
+  /* font-weight: 500; */
+  font-size: 12px;
+}
+
+/* Mobile stacking */
+@media (max-width: 900px) {
+  .genderRow {
+    flex-direction: column;
+  }
+}
+
+
+.patientPhone{
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  
+}
+
+.patientPhone > div {
+  flex: 1;
+  min-width: 300px;
+  
+}
+
+.patientPhone > div input {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px; 
+  
+}
+
+.patientPhone > div {
+  padding: 6px;
+  font-size: 12px;
+}
+
+
+.patientRemarks {
+
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+
+}
+
+.patientRemarks > div {
+  flex: 1;
+  min-width: 180px;
+}
+
+.patientRemarks > div input {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px; 
+  
+}
+
+.patientRemarks > div {
+  padding: 6px;
+  font-size: 12px;
+}
+
+
+
+.patientInsurance {
+  
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  
+}
+
+
+
+.patientInsurance > div {
+  flex: 1;
+  min-width: 180px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+.patientInsurance > div input {
+  width: 100%;
+  padding: 8px;
+  font-size: 12px; 
+  
+}
+
+
+
+.patientIdentification {
+
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+
+}
+
+.patientIdentification > div {
+  flex: 1;
+  min-width: 180px;
+}
+
+.patientIdentification > div input {
+  width: 50%;
+  padding: 8px;
+  font-size: 12px; 
+  
+}
+
+
+.patientIdentification > div {
+  padding: 8px;
+  font-size: 12px;
+  
+}
+
+
+
+
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end; /* aligns buttons to the right */
+  gap: 6px;                /* space between buttons */
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.btn-cancel {
+  background: #ccc;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-save {
+  background: #530505;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+/* .generateBillBtnContainer { */
+  /* display: inline-block;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 30px; */
+    /* background: #f44336; */
+    /* color: white; */
+    /* color:#f44336;
+    text-decoration: none;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer; */
+/* } */
+
+
+
+
+
+
+
+

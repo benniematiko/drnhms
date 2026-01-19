@@ -1,0 +1,88 @@
+we are doctors{% extends 'base.html' %}
+
+{% block title %} doctors | ProClinc HMS{% endblock %}
+
+{% block content %}
+
+    <main>
+      <div>
+        <h2>Doctors List</h2>
+      </div>
+
+      <div>
+        <div>
+          <div>
+            <label for="entries">Show</label>
+            <select id="entries">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span>entries</span>
+          </div>
+
+          <div>Search <input type="text" /></div>
+        </div>
+      </div>
+
+      <!-- Tabke to display the data -->
+
+      <table>
+        <thead>
+          <tr>
+            
+            <th>Doctor ID</th>
+            <th>doctor Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Phone Number</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Last Visit</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Sample rows -->
+          
+
+
+            <tbody>
+        {% for doctor in doctors %}
+        <tr>
+            <td>1</td>
+            <td>{{ doctor.first_name }} {{ doctor.last_name }}</td>
+            <td>{{ doctor.age }}</td>
+            <td>{{ doctor.gender }}</td>
+            <td>{{ doctor.phone }}</td>
+            <td>{{ doctor.email }}</td>
+            <td>{{ doctor.address }}</td>
+            <td>{{ doctor.last_visit }}</td>                     
+            <td>{{ doctor.created_at }}</td>   
+            <td>{{ doctor.status }}</td>            
+            <td>
+        <button>Edit</button> 
+        <button>Update</button>  
+        <button>Delete</button>
+    </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No doctors found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+          
+        
+         
+        </tbody>
+      </table>
+    </main>
+
+
+
+{% endblock %}
+
