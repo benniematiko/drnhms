@@ -1,65 +1,38 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import (
-    Sum, F, Value, DecimalField, ExpressionWrapper, Case, When
-)
+from django.db.models import Sum, F, Value, DecimalField, ExpressionWrapper, Case, When
 from django.db.models.functions import Coalesce
-# from billing.models import Invoice
-from billing.models import Invoice, InvoiceItem, Payment
-
-# views.py for generatebill
-from .models import DrugCategory, Drug
-
-# Fetch a doctors name when I type a few characters in the generatebill.html
-from doctors.models import Doctor  # Import from the correct app
-
-# views.py for fetching the drugs
-# Fetch a patient name when I type a few characters in the generatebill.html
 from django.http import JsonResponse
-
-
-
-# from .models import Bill, BillItem, Batch
-
-# Fetch a patient name when I type a few characters in the generatebill.html
-from patients.models import Patient
-
-
-
-# Save data to the databases Invoice, InvoiceItem, and Payment models!
-
 from django.contrib import messages
 from django.db import transaction
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from billing.models import Invoice, InvoiceItem, Payment
+from .models import DrugCategory, Drug
+from doctors.models import Doctor
+from patients.models import Patient
+
 from decimal import Decimal
 import json
 import uuid
 from datetime import datetime
-from pharmacy.models import Drug, DrugCategory
 
 
 @login_required
 def pharmacy_home(request):
-    invoices = (
+    invoices_list = (
         Invoice.objects
         .select_related('patient', 'doctor')
         .annotate(
-            # Total paid by patient
             paid_amount=Coalesce(
                 Sum('payments__amount'),
                 Value(0, output_field=DecimalField())
             ),
-
-            # ❌ REMOVED net_amount annotation since it's now a model field
-            # net_amount=ExpressionWrapper(
-            #     F('total_amount') - F('discount_amount'),
-            #     output_field=DecimalField(max_digits=10, decimal_places=2)
-            # ),
         )
         .annotate(
-            # Balance: only when paid < net
             balance_amount=Case(
                 When(
-                    paid_amount__lt=F('net_amount'),  # ✅ Still works - uses the model field
+                    paid_amount__lt=F('net_amount'),
                     then=ExpressionWrapper(
                         F('net_amount') - F('paid_amount'),
                         output_field=DecimalField(max_digits=10, decimal_places=2)
@@ -68,11 +41,9 @@ def pharmacy_home(request):
                 default=Value(0),
                 output_field=DecimalField(max_digits=10, decimal_places=2)
             ),
-
-            # Refund: only when paid > net
             refund_amount=Case(
                 When(
-                    paid_amount__gt=F('net_amount'),  # ✅ Still works - uses the model field
+                    paid_amount__gt=F('net_amount'),
                     then=ExpressionWrapper(
                         F('paid_amount') - F('net_amount'),
                         output_field=DecimalField(max_digits=10, decimal_places=2)
@@ -84,42 +55,28 @@ def pharmacy_home(request):
         )
         .order_by('-created_at')
     )
+    
+    # Pagination
+    items_per_page = request.GET.get('per_page', 20)
+    paginator = Paginator(invoices_list, items_per_page)
+    
+    page = request.GET.get('page', 1)
+    try:
+        invoices = paginator.page(page)
+    except PageNotAnInteger:
+        invoices = paginator.page(1)
+    except EmptyPage:
+        invoices = paginator.page(paginator.num_pages)
 
     context = {
-        'invoices': invoices
+        'invoices': invoices,
+        'total_records': paginator.count,
     }
 
     return render(request, 'pharmacy/pharmacy.html', context)
 
 
-
 @login_required
-# def generatebill(request):
-    # Fetch all drug categories from the database
-    # categories = DrugCategory.objects.all()  # ordering by name
-     # Pass them to the template context
-    # context = {
-    #     'categories': categories
-    # }
-    # return render(request, 'pharmacy/generatebill.html', context)
-
-# here we are also fecthing doctor name on generatebill.html
-# Save data to the database
-# def generatebill(request):
-    # Fetch categories and active doctors
-    # categories = DrugCategory.objects.all()
-    # doctors = Doctor.objects.filter(
-    #     status__in=['Employed', 'Full-Time']
-    # ).order_by('last_name', 'first_name')
-    
-    # context = {
-    #     'categories': categories,
-    #     'doctors': doctors
-    # }
-    
-    # return render(request, 'pharmacy/generatebill.html', context)
-
-
 def generatebill(request):
     if request.method == 'POST':
         try:
@@ -163,7 +120,7 @@ def generatebill(request):
                     status='PAID' if payment_amount >= net_amount else 'PENDING'
                 )
                 
-                # Get medicine data (should be sent as JSON from frontend)
+                # Get medicine data
                 medicines_data = request.POST.get('medicines_data')
                 if medicines_data:
                     medicines = json.loads(medicines_data)
@@ -232,13 +189,11 @@ def get_medicines_by_category(request):
     
     if category_id:
         try:
-            # Get unique medicine names for the category
             medicines = Drug.objects.filter(
                 category_id=category_id,
                 is_active=True
             ).values('name').distinct().order_by('name')
             
-            # Convert to list with id as name for uniqueness
             medicine_list = [{'id': med['name'], 'name': med['name']} for med in medicines]
             return JsonResponse({'medicines': medicine_list})
         except Exception as e:
@@ -252,11 +207,10 @@ def get_batches_by_medicine(request):
     
     if medicine_name:
         try:
-            # Get all batches (Drug records) for this medicine name
             batches = Drug.objects.filter(
                 name=medicine_name,
                 is_active=True,
-                stock_quantity__gt=0  # Only show batches with stock
+                stock_quantity__gt=0
             ).values(
                 'id',
                 'batch_number',
@@ -274,17 +228,11 @@ def get_batches_by_medicine(request):
     return JsonResponse({'batches': []})
 
 
-
-#  Fetch a patient name when I type a few characters
-
-
-
-
 def get_patients(request):
     """Fetch patients based on search query"""
     query = request.GET.get('q', '')
     
-    if len(query) >= 2:  # Only search if at least 2 characters
+    if len(query) >= 2:
         patients = Patient.objects.filter(
             first_name__icontains=query
         ) | Patient.objects.filter(
@@ -293,7 +241,7 @@ def get_patients(request):
             hospital_number__icontains=query
         )
         
-        patients = patients[:10]  # Limit to 10 results
+        patients = patients[:10]
         
         patient_list = [{
             'id': str(patient.id),
@@ -307,28 +255,15 @@ def get_patients(request):
     return JsonResponse([], safe=False)
 
 
-
-
-
 def get_batches(request):
     drug_id = request.GET.get('drug_id')
     
     if drug_id:
-        # Get all drugs with the same ID (in case you have multiple batches)
-        # Or if you only have one drug per ID, this will return that one drug
         drugs = Drug.objects.filter(id=drug_id, is_active=True).values(
             'id', 'batch_number', 'expiry_date', 'stock_quantity', 'unit_price'
         )
         
-        # Convert QuerySet to list
         batches = list(drugs)
-        
         return JsonResponse({'batches': batches})
     
     return JsonResponse({'batches': []})
-
-
-
-
-
-

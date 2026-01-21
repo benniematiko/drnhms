@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block title %}Dashboard{% endblock %} 
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
 {% block content %}
 
 <aside class="sidebar">
@@ -20,9 +21,11 @@
 <main class="content">
   <div class="pharmacy">
     <div class="pharmacyheader">
-      <div><h1>Pharmacy BillS</h1></div>
+      <div><h1>Pharmacy Bills</h1></div>
       <div>
-        <a href="{% url 'generatebill' %}"> <button>+Generate a Bill</button> </a>
+        <a href="{% url 'generatebill' %}">
+          <button>+Generate a Bill</button>
+        </a>
         <a href=""><button>Medicines</button></a>
       </div>
     </div>
@@ -31,17 +34,25 @@
       <div>Search drug</div>
 
       <div>
-        <select>
-          <option>20</option>
-          <option>50</option>
-          <option>100</option>
-        </select>
+       
+
+        <!-- Per page selector -->
+        <form method="GET" style="display: inline;">
+          <select name="per_page" onchange="this.form.submit()">
+            <option value="20" {% if request.GET.per_page == '20' or not request.GET.per_page %}selected{% endif %}>20</option>
+            <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+            <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
+          </select>
+        </form>
+        
         <span><button>Excel</button></span>
         <span><button>CSV</button></span>
         <span><button>PDF</button></span>
         <span><button>Print</button></span>
       </div>
     </div>
+
+ 
 
     <div class="pharmacytable">
       <!-- Display data  -->
@@ -61,56 +72,91 @@
             <th>Balance Amount (Kshs)</th>
           </tr>
         </thead>
+
         <tbody>
-         
           {% for invoice in invoices %}
           <tr>
             <td>{{ invoice.invoice_number }}</td>
             <td>{{ invoice.patient.case_id }}</td>
-            <td>{{ invoice.created_at|date:"Y-m-d" }}</td>      
+            <td>{{ invoice.created_at|date:"Y-m-d" }}</td>
 
-            <td>{{ invoice.patient.first_name }} {{ invoice.patient.last_name }}</td>
+            <td>
+              {{ invoice.patient.first_name }} {{ invoice.patient.last_name }}
+            </td>
             <!-- <td>{{ invoice.doctor.first_name }} {{ invoice.doctor.last_name }}</td> -->
-             <td>
-                {% if invoice.doctor %}
-                  {{ invoice.doctor.first_name }} {{ invoice.doctor.last_name }}
-                {% else %}
-                  —
-                {% endif %}
-              </td>
+            <td>
+              {% if invoice.doctor %} {{ invoice.doctor.first_name }} 
+              {{ invoice.doctor.last_name }} {% else %} — {% endif %}
+            </td>
 
             <td>{{ invoice.discount_amount|floatformat:2 }}</td>
             <td>{{ invoice.net_amount|floatformat:2 }}</td>
             <td>{{ invoice.paid_amount|floatformat:2 }}</td>
             <!-- <td>{{ invoice.refund_amount|floatformat:2 }}</td> -->
 
-            <td class="{% if invoice.refund_amount > 0 %}text-success{% endif %}">
+            <td
+              class="{% if invoice.refund_amount > 0 %}text-success{% endif %}"
+            >
               {{ invoice.refund_amount|floatformat:2 }}
             </td>
 
-
             <!-- <td>{{ invoice.balance_amount }|floatformat:2}</td> -->
-             <td class="{% if invoice.balance_amount > 0 %}text-danger{% endif %}">
+            <td
+              class="{% if invoice.balance_amount > 0 %}text-danger{% endif %}"
+            >
               {{ invoice.balance_amount|floatformat:2 }}
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td>
-              No pharmacy invoices found.
-            </td>
+            <td>No pharmacy invoices found.</td>
           </tr>
           {% endfor %}
-          
         </tbody>
+
       </table>
     </div>
 
     <div class="pharmacypagination">
-      <div class="">Records: 1 to 100 of 1,781</div>
-      <div class=""><1, 2,......18 ></div>
+      <div class="records-info">
+        Records: {{ invoices.start_index }} to {{ invoices.end_index }} of {{ total_records }}
+      </div>
+
+
+      <div class="pagination-controls">
+        {% if invoices.has_previous %}
+          <a href="?page=1&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">«</a>
+          <a href="?page={{ invoices.previous_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">‹</a>
+        {% else %}
+          <span class="pagination-btn disabled">«</span>
+          <span class="pagination-btn disabled">‹</span>
+        {% endif %}
+        
+        <!-- Page numbers -->
+        {% for num in invoices.paginator.page_range %}
+          {% if num == invoices.number %}
+            <span class="pagination-btn active">{{ num }}</span>
+          {% elif num > invoices.number|add:'-3' and num < invoices.number|add:'3' %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == 1 or num == invoices.paginator.num_pages %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == invoices.number|add:'-3' or num == invoices.number|add:'3' %}
+            <span class="pagination-ellipsis">...</span>
+          {% endif %}
+        {% endfor %}
+        
+        {% if invoices.has_next %}
+          <a href="?page={{ invoices.next_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">›</a>
+          <a href="?page={{ invoices.paginator.num_pages }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">»</a>
+        {% else %}
+          <span class="pagination-btn disabled">›</span>
+          <span class="pagination-btn disabled">»</span>
+        {% endif %}
+      </div>
+
     </div>
-  </div>
+
+ </div>
 </main>
 
 {% endblock %}
