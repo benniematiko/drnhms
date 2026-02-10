@@ -1,0 +1,337 @@
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<!-- <aside class="sidebar">
+  <ul>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Billing</a></li>
+    <li><a href="#">Appointments</a></li>
+    <li><a href="#">OPD - Out Patient</a></li>
+    <li><a href="#">IPD - In Patient</a></li>
+    <li><a href="{% url 'pharmacy' %}">Pharmacy</a></li>
+    <li><a href="#">Laboratory</a></li>
+    <li><a href="#">Radiology</a></li>
+    <li><a href="#">Blood Bank</a></li>
+    <li><a href="#">Ambulance</a></li>
+    <li><a href="#">Front Office</a></li>
+  </ul>
+</aside> -->
+
+<aside class="sidebar">
+  <ul>
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'billings' %}">Billing</a></li>
+    <li><a href="#">Appointments</a></li>
+    <li><a href="#">OPD - Out Patient</a></li>
+    <li><a href="#">IPD - In Patient</a></li>
+    <li><a href="#">Pharmacy</a></li>
+    <li><a href="#">Laboratory</a></li>
+    <li><a href="#">Radiology</a></li>
+    <li><a href="#">Blood Bank</a></li>
+    <li><a href="#">Ambulance</a></li>
+    <li><a href="#">Front Office</a></li>
+
+
+
+    <li><a href="#">Birth & Death Record</a></li>
+    <li><a href="#">Human Resourc</a></li>
+    <li><a href="#">Duty Roster</a></li>
+    <li><a href="#">Annual Calendar</a></li>
+    <li><a href="#">Referrals</a></li>
+    <li><a href="#">Insurance Management</a></li>
+    <li><a href="#">Finance</a></li>
+    <li><a href="#">Messaging</a></li>
+    <li><a href="#">Inventory</a></li>
+    <li><a href="#">Download Center</a></li>
+
+
+    <li><a href="#">Certificate</a></li>
+    <li><a href="#">Front CMS</a></li>
+    <li><a href="#">Live Consultation</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Setup</a></li>
+
+
+
+
+
+  </ul>
+</aside>
+
+<main class="content">
+  <div class="pharmacy">
+    <div class="pharmacyheader">
+      <div><h1>Medicines Stock</h1></div>
+      <div>
+        <a href="">
+          <button>Import Medicines</button>
+        </a>
+        <button id="addMedicineBtn">+Add Medicine</button>
+        <a href="{% url 'medicinepurchaselist' %}"><button>Purchase Medicine</button></a>
+      </div>
+    </div>
+
+    <div class="pharmacysearch">
+      <div>Search drug</div>
+
+      <div> 
+        <div>
+          <button>Delete Selected</button>
+        </div>
+
+        <!-- Per page selector -->
+        <form method="GET" style="display: inline;">
+          <select name="per_page" onchange="this.form.submit()">
+            <option value="20" {% if request.GET.per_page == '20' or not request.GET.per_page %}selected{% endif %}>20</option>
+            <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+            <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
+          </select>
+        </form>
+        
+        <span><button>Excel</button></span>
+        <span><button>CSV</button></span>
+        <span><button>PDF</button></span>
+        <span><button>Print</button></span>
+      </div>
+    </div>
+
+    <div class="pharmacytable">
+      <!-- Display data  -->
+      <table class="billingtable">
+        <thead>
+          <tr>
+            <th class="checkbox-cell">
+              <input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()">
+            </th>
+            <th>Medicine Name</th>
+            <th>Medicine Company</th>
+            <th>Medicine Composition</th>
+            <th>Medicine Category</th>
+            <th>Medicine Group</th>
+            <th>Unit</th>
+            <th>Available Quantity</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for drug in drugs %}
+            <tr>
+              <td class="checkbox-cell">
+                <input type="checkbox" class="medicine-checkbox" value="{{ drug.id }}" data-name="{{ drug.name }}">
+              </td>
+              <td>{{ drug.name }}</td>
+              <td>{{ drug.manufacturer|default:"N/A" }}</td>
+              <td>{{ drug.strength|default:"N/A" }}</td>
+              <td>{{ drug.category.name|default:"N/A" }}</td>
+              <td>{{ drug.category.name|default:"N/A" }}</td>
+              <td>{{ drug.unit }}</td>
+              <td>{{ drug.stock_quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" style="text-align: center;">No medicines available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pharmacypagination">
+      <div class="records-info">
+        Records: {{ invoices.start_index }} to {{ invoices.end_index }} of {{ total_records }}
+      </div>
+
+      <div class="pagination-controls">
+        {% if invoices.has_previous %}
+          <a href="?page=1&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">«</a>
+          <a href="?page={{ invoices.previous_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">‹</a>
+        {% else %}
+          <span class="pagination-btn disabled">«</span>
+          <span class="pagination-btn disabled">‹</span>
+        {% endif %}
+        
+        <!-- Page numbers -->
+        {% for num in invoices.paginator.page_range %}
+          {% if num == invoices.number %}
+            <span class="pagination-btn active">{{ num }}</span>
+          {% elif num > invoices.number|add:'-3' and num < invoices.number|add:'3' %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == 1 or num == invoices.paginator.num_pages %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == invoices.number|add:'-3' or num == invoices.number|add:'3' %}
+            <span class="pagination-ellipsis">...</span>
+          {% endif %}
+        {% endfor %}
+        
+        {% if invoices.has_next %}
+          <a href="?page={{ invoices.next_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">›</a>
+          <a href="?page={{ invoices.paginator.num_pages }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">»</a>
+        {% else %}
+          <span class="pagination-btn disabled">›</span>
+          <span class="pagination-btn disabled">»</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Add Medicine Modal -->
+<div id="addMedicineModal" class="modalAddMedicine">
+  <div class="modal-content-add-medicine"> 
+    <div class="modal-header-add-medicine">
+      <h2>Add Medicine Details</h2>
+      <span class="close">&times;</span>
+    </div>
+    
+    <form id="addMedicineForm" method="POST" action="">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+
+
+        <div class="form-group">
+          <label for="medicineName">Medicine Name <span class="required">*</span></label>
+          <input type="text" id="medicineName" name="medicine_name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="medicineCategory">Medicine Category</label>
+          <select id="medicineCategory" name="medicine_category">
+            <option value="">---Select Category---</option>
+            <!-- Add your categories dynamically from backend -->
+            <option value="tablet">Tablet</option>
+            <option value="syrup">Syrup</option>
+            <option value="injection">Injection</option>
+            <option value="cream">Cream</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="medicineCompany">Medicine Company</label>          
+          <select id="medicineCompany" name="medicine_company">
+            <option>---Select Company---</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="medicineComposition">Medicine Composition/Strength</label>
+          <input type="text" id="medicineComposition" name="medicine_composition">
+        </div>       
+
+
+
+        <div class="form-group">
+          <label for="medicineGroup">Medicine Group</label>
+          <select id="medicineGroup" name="medicine_group">
+            <option value="">--Select Group---</option>
+            <!-- Add your groups dynamically from backend -->
+            <option value="antibiotic">Antibiotic</option>
+            <option value="painkiller">Painkiller</option>
+            <option value="antiviral">Antiviral</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="medicineUnit">Unit <span class="required">*</span></label>
+          <select id="medicineUnit" name="medicine_unit" required>
+            <option value="">---Select Unit---</option>
+            <option value="piece">Kgs</option>
+            <option value="piece">Litres</option>
+            <option value="piece">Piece</option>
+            <option value="bottle">Bottle</option>
+            <option value="box">Box</option>
+            <option value="strip">Strip</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="stockQuantity">Min Level <span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="stockQuantity">Re-Order Level <span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+
+
+        <div class="form-group">
+          <label for="stockQuantity">Tax <span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+
+
+        <div class="form-group">
+          <label for="stockQuantity">Box/Packing<span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="stockQuantity">VAT A/C<span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="stockQuantity">Rack Number<span class="required">*</span></label>
+          <input type="number" id="stockQuantity" name="stock_quantity" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="purchasePrice">Note</label>
+          <textarea></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="sellingPrice">Medicine Photo ( JPG | JPEG | PNG  )</label>
+          
+          <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+        </div>
+
+        
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn-submit">Add Medicine</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+// Get modal elements
+const modal = document.getElementById('addMedicineModal');
+const btn = document.getElementById('addMedicineBtn');
+const closeBtn = document.getElementsByClassName('close')[0];
+const cancelBtn = document.getElementById('cancelBtn');
+
+// Open modal when button is clicked
+btn.onclick = function() {
+  modal.style.display = 'block';
+}
+
+// Close modal when X is clicked
+closeBtn.onclick = function() {
+  modal.style.display = 'none';
+}
+
+// Close modal when Cancel is clicked
+cancelBtn.onclick = function() {
+  modal.style.display = 'none';
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Optional: Reset form when modal closes
+modal.addEventListener('hidden', function() {
+  document.getElementById('addMedicineForm').reset();
+});
+</script>
+
+{% endblock %}

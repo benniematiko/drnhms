@@ -2,75 +2,85 @@
 {% block title %}Dashboard{% endblock %} 
 {% block content %}
 
+
 <div class="generateBill">
   <form id="billForm">
     {% csrf_token %}
     <div class="medicineAddPatient">
-      <!-- <div>       
-           <input type="text" id="patientName" name="patient_name" placeholder="Patient Name" />
 
-      </div> -->
+
 
       <div class="sectionPatientName">
-        <input
-          type="text"
-          id="patientName"
-          name="patient_name"
-          placeholder="Patient Name"
-          autocomplete="off"
-        />
+        <input type="text" id="patientName" name="patient_name" placeholder="Patient Name" autocomplete="off" />
         <input type="hidden" id="patientId" name="patient_id" />
-        <div
-          id="patientSuggestions"
-          style="
-            position: absolute;
-            background: white;
-            border: 1px solid #ddd;
-            max-height: 200px;
-            overflow-y: auto;
-            width: 100%;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        <div id="patientSuggestions" 
+            style=" position: absolute;
+                    background: white;
+                    border: 1px solid #ddd;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    width: 100%;
+                    display: none;
+                    z-index: 1000;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           "
         ></div>
+      </div> 
+
+
+
+
+
+      <div>
+        <button class="open_PatientModal" id="openPatientModal" type="button">+ Add Patient</button>
       </div>
 
       <div>
-        <button id="openPatientModal" type="button">+ Add Patient</button>
+        <input type="text" id="prescriptionNo" name="prescription" placeholder="Prescription No"/>
+        <span></span>
       </div>
 
-      <div>
-        <input
-          type="text"
-          id="prescriptionNo"
-          name="prescription"
-          placeholder="Prescription No"
-        />
-      </div>
+      <div class="generateBillBtnContainer">      
+        
+        <a
+          class="generateBillBtnClose"
+          href="{% url 'pharmacy' %}"
+          style="cursor: pointer; text-decoration: none; color: inherit"
+        >
+          ×
+        </a>
 
-      <div class="generateBillBtnContainer">
-        <a class="generateBillBtnClose" href="{% url 'pharmacy' %}" style="cursor: pointer; text-decoration: none; color: inherit;">
-    ×
-  </a>
-        </div>
+      </div>
     </div>
 
     <div class="topSection">
       <div class="topRow">
         <div class="leftTopRow">
-          <div class="billNo">Bill No 1831</div>
-          <div class="caseId">Case ID</div>
+          <div class="billNo">            
+            <strong><label for="generateBillNo">Bill No:</label></strong> 
+            <span id="generateBillNo" class="text-primary">Generating...</span>            
+          </div>
+          <div class="caseId">
+            <strong><label for="generateCaseId">Case ID:</label></strong> 
+            <span id="generateCaseId" class="text-primary">Generating...</span>  
+          </div>
         </div>
-        <div class="rightTop">Date/Time</div>
+        <div class="rightTop">
+          <label for="generateDateTime">Date | Time </label>
+          <input type="text" id="generateDateTime" name="date_time" readonly 
+                style="border: none; background: transparent; font-weight: bold;">
+        </div>
       </div>
     </div>
 
     <div id="medicineRowsContainer">
       <div class="medicineCategory medicineRow">
         <div class="medicineInput">
-          <label for="medicinecategory"> Medicine Category*</label>
-          <select class="medicinecategory">
+          <label for="generateMedicineCategory">Medicine Category*</label>
+          <select 
+            class="generate_MedicineCategory" 
+            id="generateMedicineCategory"
+            name="medicine_category">
             <option value="">--Select Category--</option>
             {% for category in categories %}
             <option value="{{ category.id }}">{{ category.name }}</option>
@@ -79,34 +89,54 @@
         </div>
 
         <div class="medicineInput">
-          <label for="medicinename">Medicine Name* </label>
-          <select class="medicinename">
+          <label for="generateMedicineName">Medicine Name*</label>
+          <select 
+            class="generate_MedicineName" 
+            id="generateMedicineName"
+            name="medicine_name">
             <option value="">--Select Medicine--</option>
           </select>
         </div>
 
         <div class="medicineInput">
-          <label for="batchnumber">Batch No*</label>
-          <select class="batchnumber">
+          <label for="generateBatchNumber">Batch No*</label>
+          <select 
+            class="generate_BatchNumber" 
+            id="generateBatchNumber"
+            name="batch_number">
             <option value="">--Select Batch--</option>
           </select>
         </div>
 
         <div class="medicineInput">
-          <label for="expirydate">Expiry Date*</label>
-          <input type="text" name="expirydate" class="expirydate" readonly />
+          <label for="generateExpiryDate">Expiry Date*</label>
+          <input 
+            type="text" 
+            name="expiry_date" 
+            class="generate_ExpiryDate" 
+            id="generateExpiryDate" 
+            readonly />
         </div>
 
         <div class="medicineInput">
           <div class="quantityAvailable">
             <div class="medicineQuantity">
-              <label for="available_qty">Quantity *</label>
-              <input type="text" class="medicinequantity" />
+              <label for="generateQuantity">Quantity*</label>
+              <input 
+                type="number" 
+                class="generate_Quantity" 
+                id="generateQuantity"
+                name="quantity" />
             </div>
 
             <div class="medicineAvailable">
-              <label for="availableqty">Available Qty*</label>
-              <input type="text" class="availableqty" readonly />
+              <label for="generateAvailableQty">Available Qty*</label>
+              <input 
+                type="number" 
+                class="generate_AvailableQty" 
+                id="generateAvailableQty"
+                name="available_qty" 
+                readonly />
             </div>
           </div>
         </div>
@@ -114,13 +144,25 @@
         <div class="medicineInput">
           <div class="salesTax">
             <div class="medicineSales">
-              <label for="medicinesalesprice">Sales Price*</label>
-              <input type="text" class="medicinesalesprice" readonly />
+              <label for="generateMedicineSalesPrice">Sales Price*</label>
+              <input 
+                type="number" 
+                step="0.01"
+                class="generate_MedicineSalesPrice" 
+                id="generateMedicineSalesPrice"
+                name="sales_price" 
+                readonly />
             </div>
 
             <div class="medicineTax">
-              <label for="salestax">Tax*</label>
-              <input type="text" class="medicinetax" readonly />
+              <label for="generateSalesTax">Tax*</label>
+              <input 
+                type="number" 
+                step="0.01"
+                class="generate_SalesTax" 
+                id="generateSalesTax"
+                name="sales_tax" 
+                readonly />
             </div>
           </div>
         </div>
@@ -128,12 +170,24 @@
         <div class="medicineInput">
           <div class="amountT">
             <div class="medicineAmount">
-              <label for="medicineamount">Amount ( Kshs) *</label>
-              <input type="text" class="medicineamount" readonly />
+              <label for="generateMedicineAmount">Amount (Kshs)*</label>
+              <input 
+                type="number" 
+                step="0.01"
+                class="generate_MedicineAmount" 
+                id="generateMedicineAmount"
+                name="medicine_amount" 
+                readonly />
             </div>
 
             <div class="medicineDeleteRow">
-              <button type="button" class="deleteRowBtn">X</button>
+              <button 
+                type="button" 
+                class="delete_RowBtn" 
+                id="deleteRowBtn"
+                aria-label="Delete Row">
+                X
+              </button>
             </div>
           </div>
         </div>
@@ -142,7 +196,7 @@
 
     <div class="medicineAddRow">
       <div class="addRow">
-        <button type="button" id="addRowBtn">+ Add a Row</button>
+        <button type="button" class="add_RowBtn" id="addRowBtn">+ Add a Row</button>
       </div>
     </div>
 
@@ -154,8 +208,10 @@
       <div class="sectionDoctorLeft">
         <div class="SectionDoctorRowOne">
           <div class="sectionHospitalDoctor">
-            <label>Hospital Doctor Name *</label>
-            <select name="hospital_doctor" id="hospital_doctor">
+            <label for="generateHospitalDoctor">Hospital Doctor Name*</label>
+            <select 
+              name="hospital_doctor" 
+              id="generateHospitalDoctor">
               <option value="">--Select Hospital Doctor--</option>
               {% for doctor in doctors %}
               <option value="{{ doctor.id }}">
@@ -166,8 +222,10 @@
           </div>
 
           <div class="sectionExternalDoctor">
-            <label>Doctor Name (External) *</label>
-            <select name="doctor_name" id="doctor_name">
+            <label for="generateDoctorName">Doctor Name (External)</label>
+            <select 
+              name="doctor_name" 
+              id="generateDoctorName">
               <option value="">--Select Doctor--</option>
               {% for doctor in doctors %}
               <option value="{{ doctor.id }}">
@@ -179,71 +237,78 @@
         </div>
 
         <div class="SectionDoctorRowTwo">
-          <div>Note</div>
-          <textarea name="note" id="note"></textarea>
+          <div><label for="generateNote">Note</label></div>
+          <textarea 
+            name="note" 
+            id="generateNote"
+            rows="4"
+            placeholder="Enter any notes here..."></textarea>
         </div>
       </div>
 
       <div class="sectionDoctorRight">
         <div class="sectionTotalsRowOne">
-          <div>Total ( Kshs )</div>
-
+          <div><label for="generateTotalAmount">Total (Kshs)</label></div>
           <div>
             <input
               type="number"
-              id="totalAmount"
+              step="0.01"
+              id="generateTotalAmount"
               name="total_amount"
-              placeholder="0"
+              placeholder="0.00"
               readonly
             />
           </div>
         </div>
 
         <div class="sectionTotalsRowTwo">
-          <div>Discount (Kshs)</div>
+          <div><label for="generateDiscountPercent">Discount (%)</label></div>
           <div>
             <input
               type="number"
-              id="discountPercent"
+              step="0.01"
+              id="generateDiscountPercent"
               name="discount_percent"
-              placeholder="Discount(%)"
+              placeholder="0"
             />
           </div>
 
           <div>
+            <label for="generateDiscountAmount">Discount Amount</label>
             <input
               type="number"
-              id="discountAmount"
+              step="0.01"
+              id="generateDiscountAmount"
               name="discount_amount"
-              placeholder="0"
+              placeholder="0.00"
               readonly
             />
           </div>
         </div>
 
         <div class="sectionTotalsRowThree">
-          <div>Tax(%)</div>
-
+          <div><label for="generateTaxAmount">Tax (%)</label></div>
           <div>
             <input
               type="number"
-              id="taxAmount"
+              step="0.01"
+              id="generateTaxAmount"
               name="tax_amount"
-              placeholder="0"
+              placeholder="0.00"
               readonly
             />
           </div>
         </div>
 
         <div class="sectionTotalsRowFour">
-          <div>Net Amount</div>
-
+          <div><label for="generateNetAmount">Net Amount</label></div>
           <div>
             <input
               type="number"
-              id="netAmount"
+              step="0.01"
+              id="generateNetAmount"
               name="net_amount"
-              placeholder="0"
+              placeholder="0.00"
               readonly
             />
           </div>
@@ -251,12 +316,12 @@
 
         <div class="sectionTotalsRowFive">
           <div>
-            <div>Payment Mode:</div>
-
-            <select id="paymentMode" name="payment_mode">
+            <div><label for="generatePaymentMode">Payment Mode:</label></div>
+            <select 
+              id="generatePaymentMode" 
+              name="payment_mode">
               <option value="">--Select Payment Mode--</option>
               <option value="CASH">Cash</option>
-              <option value="CHEQUE">Cash</option>
               <option value="CARD">Card</option>
               <option value="TRANSFER">Bank Transfer</option>
               <option value="UPI">UPI</option>
@@ -265,14 +330,14 @@
             </select>
           </div>
 
-          <!-- In the payment section, update the amount input: -->
           <div>
-            Amount*
+            <label for="generatePaymentAmount">Amount*</label>
             <input
               type="number"
+              step="0.01"
               name="payment_amount"
-              id="paymentAmount"
-              placeholder="0"
+              id="generatePaymentAmount"
+              placeholder="0.00"
             />
           </div>
         </div>
@@ -280,7 +345,9 @@
     </div>
 
     <div class="generateBillButtons">
-      <div><button>Save & Print</button></div>
+      <div>
+        <button type="button" id="savePrintBtn">Save & Print</button>
+      </div>
       <div>
         <button id="saveBillBtn" type="button">Save</button>
       </div>
@@ -288,10 +355,9 @@
   </form>
 </div>
 
+
 <!-- Add a row -->
-
 <script>
-
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("medicineRowsContainer");
     const addRowBtn = document.getElementById("addRowBtn");
@@ -311,10 +377,10 @@
       newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
       newRow.querySelectorAll("select").forEach((select) => {
         select.selectedIndex = 0;
-        if (select.classList.contains("medicinename")) {
+        if (select.id === 'generateMedicineName' || select.classList.contains('generate_MedicineName')) {
           select.innerHTML = '<option value="">--Select Medicine--</option>';
         }
-        if (select.classList.contains("batchnumber")) {
+        if (select.id === 'generateBatchNumber' || select.classList.contains('generate_BatchNumber')) {
           select.innerHTML = '<option value="">--Select Batch--</option>';
         }
       });
@@ -326,7 +392,7 @@
 
     // 3. DELETE ROW
     container.addEventListener("click", function (e) {
-      if (e.target.classList.contains("deleteRowBtn")) {
+      if (e.target.id === 'deleteRowBtn' || e.target.classList.contains('delete_RowBtn')) {
         e.preventDefault();
         const rows = document.querySelectorAll(".medicineRow");
         if (rows.length > 1) {
@@ -340,78 +406,121 @@
 
     // 4. ROW INITIALIZATION LOGIC
     function initializeRow(row) {
-      const categorySelect = row.querySelector(".medicinecategory");
-      const medicineSelect = row.querySelector(".medicinename");
-      const batchSelect = row.querySelector(".batchnumber");
-      const quantityInput = row.querySelector(".medicinequantity");
-      const availableQtyInput = row.querySelector(".availableqty");
+      const categorySelect = row.querySelector("#generateMedicineCategory, .generate_MedicineCategory");
+      const medicineSelect = row.querySelector("#generateMedicineName, .generate_MedicineName");
+      const batchSelect = row.querySelector("#generateBatchNumber, .generate_BatchNumber");
+      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
+      const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
+      const expiryDateInput = row.querySelector("#generateExpiryDate, .generate_ExpiryDate");
+      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
+      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
+      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
 
+      // Category change event
       categorySelect.addEventListener("change", function () {
         const categoryId = this.value;
-        medicineSelect.innerHTML =
-          '<option value="">--Select Medicine--</option>';
+        medicineSelect.innerHTML = '<option value="">--Select Medicine--</option>';
         batchSelect.innerHTML = '<option value="">--Select Batch--</option>';
         clearBatchDetails(row);
+        
         if (categoryId) {
-          fetch("{% url 'get_medicines' %}?category_id=" + categoryId)
-            .then((res) => res.json())
-            .then((data) => {
-              if (!data.medicines || data.medicines.length === 0) {
-                alert("No drugs in this category!");
-                return;
+          console.log('Fetching medicines for category:', categoryId);
+          
+          fetch(`/pharmacy/get-medicines-by-category/${categoryId}/`)
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
               }
-              data.medicines.forEach((med) => {
-                  medicineSelect.add(new Option(med.name, med.id));  // ✅ Correct - storing ID as value
-
-              });
+              return res.json();
+            })
+            .then((data) => {
+              console.log('Medicines received:', data);
+              
+              if (data.status === 'success' && data.medicines && data.medicines.length > 0) {
+                data.medicines.forEach((med) => {
+                  const option = new Option(med.name, med.id);
+                  medicineSelect.add(option);
+                });
+              } else {
+                alert("No medicines found in this category!");
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching medicines:", error);
+              alert("Failed to load medicines. Please try again.");
             });
         }
       });
 
+      // Medicine change event
       medicineSelect.addEventListener("change", function () {
-        const medName = this.value;
+        const medicineId = this.value;
         batchSelect.innerHTML = '<option value="">--Select Batch--</option>';
         clearBatchDetails(row);
-        if (medName) {
-          fetch(
-            "{% url 'get_batches' %}?medicine_name=" +
-              encodeURIComponent(medName),
-          )
-            .then((res) => res.json())
+        
+        if (medicineId) {
+          console.log('Fetching batches for medicine ID:', medicineId);
+          
+          fetch(`/pharmacy/get-batches-by-medicine/?medicine_id=${medicineId}`)
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+              }
+              return res.json();
+            })
             .then((data) => {
-              data.batches.forEach((batch) => {
-                const opt = new Option(`${batch.batch_number}`, batch.id);
-                opt.dataset.expiryDate = batch.expiry_date;
-                opt.dataset.availableQty = batch.stock_quantity;
-                opt.dataset.salesPrice = batch.unit_price;
-                batchSelect.add(opt);
-              });
+              console.log('Batches received:', data);
+              
+              if (data.status === 'success' && data.batches && data.batches.length > 0) {
+                data.batches.forEach((batch) => {
+                  const opt = new Option(
+                    `Batch: ${batch.batch_number} | Exp: ${batch.expiry_date} | Stock: ${batch.stock_quantity}`,
+                    batch.id
+                  );
+                  opt.dataset.expiryDate = batch.expiry_date;
+                  opt.dataset.availableQty = batch.stock_quantity;
+                  opt.dataset.salesPrice = batch.unit_price;
+                  opt.dataset.batchNumber = batch.batch_number;
+                  batchSelect.add(opt);
+                });
+              } else {
+                alert("No batches available for this medicine!");
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching batches:", error);
+              alert("Failed to load batches. Please try again.");
             });
         }
       });
 
+      // Batch change event
       batchSelect.addEventListener("change", function () {
         const opt = this.options[this.selectedIndex];
         if (this.value) {
-          row.querySelector(".expirydate").value = opt.dataset.expiryDate || "";
+          expiryDateInput.value = opt.dataset.expiryDate || "";
           availableQtyInput.value = opt.dataset.availableQty || "";
-          row.querySelector(".medicinesalesprice").value =
-            opt.dataset.salesPrice || "";
+          salesPriceInput.value = opt.dataset.salesPrice || "";
+          
           const price = parseFloat(opt.dataset.salesPrice) || 0;
-          row.querySelector(".medicinetax").value = (price * 0.16).toFixed(2);
+          taxInput.value = (price * 0.16).toFixed(2);
+          
           calculateAmount(row);
         } else {
           clearBatchDetails(row);
         }
       });
 
+      // Quantity input event
       quantityInput.addEventListener("input", function () {
         const enteredQty = parseFloat(this.value) || 0;
         const availableQty = parseFloat(availableQtyInput.value) || 0;
+        
         if (enteredQty > availableQty) {
           alert(`Insufficient Stock! Only ${availableQty} available.`);
           this.value = availableQty;
         }
+        
         calculateAmount(row);
         updateGrandTotal();
       });
@@ -419,245 +528,192 @@
 
     // 5. CALCULATION HELPERS
     function calculateAmount(row) {
-      const qty = parseFloat(row.querySelector(".medicinequantity").value) || 0;
-      const price =
-        parseFloat(row.querySelector(".medicinesalesprice").value) || 0;
-      const tax = parseFloat(row.querySelector(".medicinetax").value) || 0;
+      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
+      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
+      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
+      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+      
+      const qty = parseFloat(quantityInput.value) || 0;
+      const price = parseFloat(salesPriceInput.value) || 0;
+      const tax = parseFloat(taxInput.value) || 0;
       const total = qty * price + qty * tax;
-      row.querySelector(".medicineamount").value =
-        total > 0 ? total.toFixed(2) : "";
+      
+      amountInput.value = total > 0 ? total.toFixed(2) : "";
     }
 
     function clearBatchDetails(row) {
-      row
-        .querySelectorAll(
-          ".expirydate, .availableqty, .medicinesalesprice, .medicinetax, .medicineamount, .medicinequantity",
-        )
-        .forEach((i) => (i.value = ""));
+      const expiryDateInput = row.querySelector("#generateExpiryDate, .generate_ExpiryDate");
+      const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
+      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
+      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
+      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
+      
+      [expiryDateInput, availableQtyInput, salesPriceInput, taxInput, amountInput, quantityInput].forEach(
+        (input) => {
+          if (input) input.value = "";
+        }
+      );
+      
       updateGrandTotal();
     }
 
-    // MERGED UPDATE GRAND TOTAL
+    // UPDATE GRAND TOTAL
     function updateGrandTotal() {
       let grandTotal = 0;
+      
       document.querySelectorAll(".medicineRow").forEach((row) => {
-        const amt = parseFloat(row.querySelector(".medicineamount").value) || 0;
+        const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+        const amt = parseFloat(amountInput.value) || 0;
         grandTotal += amt;
       });
 
-      const totalInput = document.querySelector(".sectionTotalsRowOne input");
+      const totalInput = document.getElementById("generateTotalAmount");
       if (totalInput) {
         totalInput.value = grandTotal.toFixed(2);
-        // This triggers Section 6 automatically
         totalInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
 
-    // 6. DISCOUNT & NET TOTAL CALCULATION (Inside Listener)
+    // 6. DISCOUNT & NET TOTAL CALCULATION
     const sectionDoctorRight = document.querySelector(".sectionDoctorRight");
+    
     sectionDoctorRight.addEventListener("input", function () {
-      const totalVal =
-        parseFloat(
-          document.querySelector(".sectionTotalsRowOne input").value,
-        ) || 0;
-      const discPercent =
-        parseFloat(
-          document.querySelector(".sectionTotalsRowTwo div:nth-child(2) input")
-            .value,
-        ) || 0;
-      const discAmountField = document.querySelector(
-        ".sectionTotalsRowTwo div:nth-child(3) input",
-      );
-      const taxPercent =
-        parseFloat(
-          document.querySelector(".sectionTotalsRowThree input").value,
-        ) || 0;
-      const netAmountField = document.querySelector(
-        ".sectionTotalsRowFour input",
-      );
-      const finalPaymentField = document.querySelector(
-        ".sectionTotalsRowFive input",
-      );
+      const totalVal = parseFloat(document.getElementById("generateTotalAmount").value) || 0;
+      const discPercent = parseFloat(document.getElementById("generateDiscountPercent").value) || 0;
+      const discAmountField = document.getElementById("generateDiscountAmount");
+      const taxField = document.getElementById("generateTaxAmount");
+      const netAmountField = document.getElementById("generateNetAmount");
+      const paymentAmountField = document.getElementById("generatePaymentAmount");
 
       const discAmount = totalVal * (discPercent / 100);
       discAmountField.value = discAmount.toFixed(2);
 
       const subtotal = totalVal - discAmount;
-      const taxAmount = subtotal * (taxPercent / 100);
+      const taxAmount = parseFloat(taxField.value) || 0;
       const netAmount = subtotal + taxAmount;
 
       netAmountField.value = netAmount.toFixed(2);
-      finalPaymentField.value = netAmount.toFixed(2);
+      paymentAmountField.value = netAmount.toFixed(2);
     });
 
-    // SAVE TO DATABASE
+    // 7. SAVE TO DATABASE
+    document.getElementById("saveBillBtn").addEventListener("click", function (e) {
+      e.preventDefault();
 
-    document
-      .getElementById("saveBillBtn")
-      .addEventListener("click", function (e) {
-        e.preventDefault();
+      // Collect medicine rows data
+      const medicineRows = [];
+      let isValid = true;
 
-        // Helper function to safely get element value
-        function getElementValue(id, defaultValue = "") {
-          const element = document.getElementById(id);
-          if (!element) {
-            console.warn(`Element with id '${id}' not found`);
-            return defaultValue;
-          }
-          return element.value || defaultValue;
+      document.querySelectorAll(".medicineRow").forEach((row, index) => {
+        const medicineSelect = row.querySelector("#generateMedicineName, .generate_MedicineName");
+        const batchSelect = row.querySelector("#generateBatchNumber, .generate_BatchNumber");
+        const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
+        const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
+        const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+        const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
+
+        if (!medicineSelect || !quantityInput || !salesPriceInput) {
+          console.warn(`Row ${index + 1}: Missing required elements`);
+          return;
         }
 
-        function getElementFloat(id, defaultValue = 0) {
-          const value = getElementValue(id, "0");
-          return parseFloat(value) || defaultValue;
-        }
+        const quantity = parseInt(quantityInput.value) || 0;
+        const unitPrice = parseFloat(salesPriceInput.value) || 0;
+        const availableQty = availableQtyInput ? parseInt(availableQtyInput.value) || 0 : 0;
 
-        // Collect medicine rows data
-        const medicineRows = [];
-        let isValid = true;
-
-        document.querySelectorAll(".medicineRow").forEach((row, index) => {
-          const drugSelect = row.querySelector(".medicinename");
-          const batchSelect = row.querySelector(".batchnumber");
-          const quantityInput = row.querySelector(".medicinequantity");
-          const unitPriceInput = row.querySelector(".medicinesalesprice");
-          const amountInput = row.querySelector(".medicineamount");
-          const availableQtyInput = row.querySelector(".availableqty");
-
-          if (!drugSelect || !quantityInput || !unitPriceInput) {
-            console.warn(`Row ${index + 1}: Missing required elements`);
+        if (medicineSelect.value && quantity > 0) {
+          if (availableQty > 0 && quantity > availableQty) {
+            alert(`Row ${index + 1}: Quantity (${quantity}) exceeds available stock (${availableQty})`);
+            isValid = false;
             return;
           }
 
-          const quantity = parseInt(quantityInput.value) || 0;
-          const unitPrice = parseFloat(unitPriceInput.value) || 0;
-          const availableQty = availableQtyInput
-            ? parseInt(availableQtyInput.value) || 0
-            : 0;
-
-          if (drugSelect.value && quantity > 0) {
-            // Validate quantity against available stock
-            if (availableQty > 0 && quantity > availableQty) {
-              alert(
-                `Row ${
-                  index + 1
-                }: Quantity (${quantity}) exceeds available stock (${availableQty})`,
-              );
-              isValid = false;
-              return;
-            }
-
-            medicineRows.push({
-              drug_id: parseInt(drugSelect.value),
-              batch_number: batchSelect ? batchSelect.value : "",
-              quantity: quantity,
-              unit_price: unitPrice,
-              line_total: amountInput
-                ? parseFloat(amountInput.value) || 0
-                : quantity * unitPrice,
-            });
-          }
-        });
-
-        if (!isValid) return;
-
-        // Validate that we have at least one medicine
-        if (medicineRows.length === 0) {
-          alert("Please add at least one medicine to the bill");
-          return;
-        }
-
-        // Collect form data with null checks
-        const formData = {
-          patient_id:
-            getElementValue("patientId") || getElementValue("patientName"),
-          prescription_no: getElementValue("prescriptionNo"),
-          hospital_doctor: getElementValue("hospital_doctor"),
-          external_doctor: getElementValue("doctor_name"),
-          total_amount: getElementFloat("totalAmount"),
-          discount_percent: getElementFloat("discountPercent"),
-          discount_amount: getElementFloat("discountAmount"),
-          tax_amount: getElementFloat("taxAmount"),
-          net_amount: getElementFloat("netAmount"),
-          payment_mode: getElementValue("paymentMode"),
-          payment_amount: getElementFloat("paymentAmount"),
-          note: getElementValue("note"),
-          invoice_items: medicineRows,
-        };
-
-        // Validate required fields
-        if (!formData.patient_id) {
-          alert("Please select a patient");
-          return;
-        }
-
-        if (!formData.hospital_doctor && !formData.external_doctor) {
-          alert("Please select a doctor");
-          return;
-        }
-
-        // Get CSRF token
-        const csrfInput = document.querySelector("[name=csrfmiddlewaretoken]");
-        if (!csrfInput) {
-          alert("Security token not found. Please refresh the page.");
-          return;
-        }
-        const csrftoken = csrfInput.value;
-
-        // Disable button to prevent double submission
-        const saveBtn = document.getElementById("saveBillBtn");
-        if (saveBtn) {
-          saveBtn.disabled = true;
-          saveBtn.textContent = "Saving...";
-        }
-
-        // Send data to backend
-        fetch("/billing/save/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrftoken,
-          },
-          body: JSON.stringify(formData),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            if (data.success) {
-              alert(
-                "Bill saved successfully! Invoice Number: " +
-                  data.invoice_number,
-              );
-              // Redirect or reset form
-              // window.location.href = `/billing/invoice/${data.invoice_id}/`;
-              // OR reset the form:
-              document.getElementById("billForm").reset();
-              location.reload(); // Refresh the page
-            } else {
-              alert("Error saving bill: " + (data.error || "Unknown error"));
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            alert("An error occurred while saving the bill: " + error.message);
-          })
-          .finally(() => {
-            // Re-enable button
-            if (saveBtn) {
-              saveBtn.disabled = false;
-              saveBtn.textContent = "Save";
-            }
+          medicineRows.push({
+            drug_id: parseInt(medicineSelect.value),
+            quantity: quantity,
+            unit_price: unitPrice
           });
+        }
       });
 
-    
-    
-    // Patient autocomplete code when I type a few characters in the generatebill.html
+      if (!isValid) return;
 
+      if (medicineRows.length === 0) {
+        alert("Please add at least one medicine to the bill");
+        return;
+      }
+
+      const patientId = document.getElementById("patientId").value;
+      if (!patientId) {
+        alert("Please select a patient from the dropdown");
+        return;
+      }
+
+      const hospitalDoctor = document.getElementById("generateHospitalDoctor").value;
+      if (!hospitalDoctor) {
+        alert("Please select a hospital doctor");
+        return;
+      }
+
+      // Prepare form data
+      const formData = {
+        patient_id: patientId,
+        hospital_doctor: hospitalDoctor,
+        prescription: document.getElementById("prescriptionNo").value || "",
+        note: document.getElementById("generateNote").value || "",
+        total_amount: parseFloat(document.getElementById("generateTotalAmount").value) || 0,
+        discount_amount: parseFloat(document.getElementById("generateDiscountAmount").value) || 0,
+        tax_amount: parseFloat(document.getElementById("generateTaxAmount").value) || 0,
+        net_amount: parseFloat(document.getElementById("generateNetAmount").value) || 0,
+        payment_mode: document.getElementById("generatePaymentMode").value || "",
+        payment_amount: parseFloat(document.getElementById("generatePaymentAmount").value) || 0,
+        medicines_data: JSON.stringify(medicineRows)
+      };
+
+      console.log("Form Data:", formData);
+
+      // Get CSRF token
+      const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+      // Disable save button
+      const saveBtn = document.getElementById("saveBillBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+
+      // Send to backend using FormData (not JSON)
+      const form = new FormData();
+      for (const key in formData) {
+        form.append(key, formData[key]);
+      }
+
+      fetch("{% url 'generatebill' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrftoken,
+        },
+        body: form
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Bill saved successfully! Invoice: " + data.invoice_number);
+            window.location.href = "{% url 'pharmacy' %}";
+          } else {
+            alert("Error: " + (data.error || "Unknown error"));
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to save bill: " + error.message);
+        })
+        .finally(() => {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save";
+        });
+    });
+
+    // 8. PATIENT AUTOCOMPLETE
     const patientInput = document.getElementById("patientName");
     const patientIdInput = document.getElementById("patientId");
     const suggestionsDiv = document.getElementById("patientSuggestions");
@@ -669,49 +725,50 @@
 
       if (query.length < 2) {
         suggestionsDiv.style.display = "none";
+        patientIdInput.value = "";
         return;
       }
 
       debounceTimer = setTimeout(() => {
-        fetch(`/pharmacy/get-patients/?q=${encodeURIComponent(query)}`)
+        
+        // This tells Django to find the URL mapped to the name 'get_patients'
+        fetch("{% url 'get_patients' %}?q=" + encodeURIComponent(query))
           .then((response) => response.json())
           .then((data) => {
             if (data.length > 0) {
               suggestionsDiv.innerHTML = data
                 .map(
                   (patient) => `
-                            <div class="patient-suggestion" 
-                                 data-id="${patient.id}" 
-                                 data-name="${patient.name}"
-                                 style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;">
-                                <strong>${patient.name}</strong> 
-                                <span style="color: #666;">(${patient.hospital_number})</span>
-                            </div>
-                        `,
+                    <div class="patient-suggestion" 
+                         data-id="${patient.id}" 
+                         data-name="${patient.name}"
+                         style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;">
+                        <strong>${patient.name}</strong> 
+                        <span style="color: #666;">(${patient.hospital_number})</span>
+                    </div>
+                `,
                 )
                 .join("");
               suggestionsDiv.style.display = "block";
 
-              document
-                .querySelectorAll(".patient-suggestion")
-                .forEach((item) => {
-                  item.addEventListener("click", function () {
-                    patientInput.value = this.dataset.name;
-                    patientIdInput.value = this.dataset.id;
-                    suggestionsDiv.style.display = "none";
-                  });
-
-                  item.addEventListener("mouseenter", function () {
-                    this.style.backgroundColor = "#f0f0f0";
-                  });
-
-                  item.addEventListener("mouseleave", function () {
-                    this.style.backgroundColor = "white";
-                  });
+              document.querySelectorAll(".patient-suggestion").forEach((item) => {
+                item.addEventListener("click", function () {
+                  patientInput.value = this.dataset.name;
+                  patientIdInput.value = this.dataset.id;
+                  suggestionsDiv.style.display = "none";
+                  console.log('Selected patient ID:', this.dataset.id);
                 });
+
+                item.addEventListener("mouseenter", function () {
+                  this.style.backgroundColor = "#f0f0f0";
+                });
+
+                item.addEventListener("mouseleave", function () {
+                  this.style.backgroundColor = "white";
+                });
+              });
             } else {
-              suggestionsDiv.innerHTML =
-                '<div style="padding: 10px; color: #999;">No patients found</div>';
+              suggestionsDiv.innerHTML = '<div style="padding: 10px; color: #999;">No patients found</div>';
               suggestionsDiv.style.display = "block";
             }
           })
@@ -722,43 +779,17 @@
     });
 
     document.addEventListener("click", function (e) {
-      if (e.target !== patientInput && e.target !== suggestionsDiv) {
+      if (e.target !== patientInput && !suggestionsDiv.contains(e.target)) {
         suggestionsDiv.style.display = "none";
       }
     });
-
-    // pop up modal & selecting patient name on the generatebill.html
-
-    const modal = document.getElementById("patientModal");
-    const btn = document.getElementById("openPatientModal");
-    const closeBtn = document.querySelector(".close-modal");
-    const cancelBtn = document.querySelector(".btn-cancel");
-
-    //   Open the modal
-    btn.onclick = function (e) {
-      e.preventDefault(); // Stop form submission
-      modal.style.display = "block";
-    };
-
-    //   Close the modal (clicking X or Cancel)
-    const closeModal = () => (modal.style.display = "none");
-
-    closeBtn.onclick = closeModal;
-    cancelBtn.onclick = closeModal;
-
-    // Close if user clicks outside the white box
-    window.onclick = function (event) {
-      if (event.target == modal) {
-        closeModal();
-      }
-    };
   });
-
 </script>
+
 
 <!-- Add Patient floating page  -->
 
-<div id="patientModal" class="modal-overlay">
+<div id="generatePatientModal" class="generateModalOverlay">
   <div class="modal-content">
     <div class="modal-header">
       <h3>Add New Patient</h3>
@@ -909,12 +940,58 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn-cancel">Cancel</button>
-          <button type="submit" class="btn-save">Save Patient</button>
+          <button type="button" class="generateCancelBtn">Cancel</button>
+          <button type="submit" class="generateSaveBtn">Save Patient</button>
         </div>
       </div>
     </form>
   </div>
 </div>
 
+
+<!-- Add Patient floating page JS  -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Get the modal and button elements
+  const patientModal = document.getElementById('generatePatientModal');
+  const openPatientModalBtn = document.getElementById('openPatientModal');
+  const closeModalBtn = document.querySelector('.close-modal');
+  const cancelBtn = document.querySelector('.generateCancelBtn');
+
+  // Open modal when button is clicked
+  if (openPatientModalBtn) {
+    openPatientModalBtn.addEventListener('click', function(e) {
+      e.preventDefault(); // Prevent any default button behavior
+      patientModal.style.display = 'flex';
+    });
+  }
+
+  // Close modal when X is clicked
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', function() {
+      patientModal.style.display = 'none';
+    });
+  }
+
+  // Close modal when Cancel button is clicked
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      patientModal.style.display = 'none';
+    });
+  }
+
+  // Close modal when clicking outside the modal content
+  if (patientModal) {
+    patientModal.addEventListener('click', function(e) {
+      if (e.target === patientModal) {
+        patientModal.style.display = 'none';
+      }
+    });
+  }
+});
+</script>
+
 {% endblock %}
+

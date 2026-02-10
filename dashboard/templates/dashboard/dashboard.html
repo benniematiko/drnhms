@@ -1,20 +1,48 @@
 {% extends "base.html" %} 
+{% load humanize %} <!-- currency formatting -->
 {% block title %}Dashboard{% endblock %} 
 {% block content %}
+
+
 
 <aside class="sidebar">
   <ul>
     <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li><a href="#">Billing</a></li>
+    <li><a href="{% url 'billings' %}">Billing</a></li>
     <li><a href="#">Appointments</a></li>
     <li><a href="#">OPD - Out Patient</a></li>
     <li><a href="#">IPD - In Patient</a></li>
-    <li><a href="#">Pharmacy</a></li>
+    <li><a href="{% url 'pharmacy' %}">Pharmacy</a></li>
     <li><a href="#">Laboratory</a></li>
     <li><a href="#">Radiology</a></li>
     <li><a href="#">Blood Bank</a></li>
     <li><a href="#">Ambulance</a></li>
     <li><a href="#">Front Office</a></li>
+
+
+
+    <li><a href="#">Birth & Death Record</a></li>
+    <li><a href="#">Human Resourc</a></li>
+    <li><a href="#">Duty Roster</a></li>
+    <li><a href="#">Annual Calendar</a></li>
+    <li><a href="#">Referrals</a></li>
+    <li><a href="#">Insurance Management</a></li>
+    <li><a href="#">Finance</a></li>
+    <li><a href="#">Messaging</a></li>
+    <li><a href="#">Inventory</a></li>
+    <li><a href="#">Download Center</a></li>
+
+
+    <li><a href="#">Certificate</a></li>
+    <li><a href="#">Front CMS</a></li>
+    <li><a href="#">Live Consultation</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Setup</a></li>
+
+
+
+
+
   </ul>
 </aside>
 
@@ -37,8 +65,8 @@
 
     
     <a href="{% url 'pharmacy' %}"><div class="card">
-      <div>Pharmacy</div>
-      <div>25</div>
+      <div>Pharmacy Income</div>
+      <div><strong>Kshs {{ pharmacy_income|floatformat:2|intcomma }}</strong></div>
     </div></a>
 
     

@@ -83,19 +83,33 @@ nav a {
 
 .sidebar {
   grid-area: sidebar;
-  background: #e0e0e0;
+  background-color: #e0e0e0;
+  border-right: 1px solid #ddd;
   padding: 10px;
 
   list-style: none;
   padding: 0;
   margin: 0;
+  height: 100vh;
+  overflow-y: auto;
+  
 }
 
-.sidebar li {
+/* Optional: Make the scrollbar look cleaner (Chrome/Safari/Edge) */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.sidebar ul li {
   margin: 0;
 }
 
-.sidebar a {
+.sidebar ul li a {
   display: block;
   padding: 8px 20px;
   color: #333;
@@ -103,11 +117,12 @@ nav a {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.sidebar a:hover {
+.sidebar ul li a:hover {
   /* background-color: #007bff; */
   background-color: #a80f1b;
   color: #ffffff;
 }
+
 
 /* .content {
   grid-area: content; */
@@ -118,6 +133,9 @@ nav a {
   
 } */
 
+
+
+
 .content {
   grid-area: content;
   background-color: #eceff4;
@@ -125,9 +143,12 @@ nav a {
   padding:0;
   margin-top: 10px;
   overflow-x: hidden; /* Prevent horizontal scroll */
+  
 }
 
-
+.content::-webkit-scrollbar {
+    width: 6px;
+}
 
 
 .footer {
@@ -215,8 +236,6 @@ a {
   overflow: visible;
 }
 
-
-
 /* .pharmacyheader {
   width: 99%;
   display: flex;
@@ -231,11 +250,6 @@ a {
   margin-bottom: 15px;
 }
 
-/* .pharmacysearch {
-  width: 99%;
-  display: flex;
-  justify-content: space-between;
-} */
 
 .pharmacysearch {
   width: 100%; /* Changed from 99% */
@@ -255,35 +269,117 @@ a {
   width: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); */
   font-size: 0.8rem;
+  min-width: 1000px; /* Set minimum width for table */
+  color: #000;
 }
 
-.billing-table thead {
-  background-color: #0f172a;
-  color: #ffffff;
+.billingtable thead {  
+  color: #3333; 
+ 
 }
 
-.billing-table th,
-.billing-table td {
-  /* padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb; */
 
+
+
+.billingtable th,
+.billingtable td {
   border: 1px solid #ccc; /* light gray border around each cell */
-  padding: 6px 8px; /* some spacing inside cells */
   font-size: 12px; /* smaller font if desired */
   text-align: left; /* optional alignment */
+  padding: 12px 8px;/* some spacing inside cells */  
+  font-weight: 600;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  border-bottom: 1px solid #eee;
+  position: relative; /* Crucial for absolute positioning of the span */
+  vertical-align: middle;
 }
 
-.billing-table tbody tr:hover {
-  background-color: #f8fafc;
-}
 
-.billing-table th {
+.billingtable tbody tr {
+    border-bottom: 1px solid #f0f2f5;
+    transition: all 0.2s ease;
+} 
+
+
+
+.billingtable tbody tr:hover {
+    /* background: #f8f9fa; */
+     background-color: #f8fbff !important;
+    transform: scale(1.003);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    
+} 
+
+
+.billingtable th {
   font-weight: 500;
   white-space: nowrap;
 }
+
+
+
+/* +++++++++++++++++++++ */
+/* 1. Make the table cell the reference point */
+.balance-cell {
+    position: relative;
+    vertical-align: middle;
+}
+
+
+/* 2. Hide the actions by default and position them */
+.row-action-container {
+    display: none; /* Completely hidden */
+    position: absolute;
+    bottom: 100%;  /* Places it exactly above the text */
+    left: 50%;
+    transform: translateX(-50%); /* Centers it horizontally */
+    background: white;
+    padding: 5px 10px;
+    border-radius:0px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #ddd;
+    white-space: nowrap; /* Prevents buttons from stacking vertically */
+    z-index: 10; /* Ensures it stays on top of other rows */
+}
+
+/* 3. The Trigger: Show on row hover */
+tr:hover .row-action-container {
+    display: block;
+    animation: fadeInSlide 0.2s ease-out;
+}
+
+/* 4. Style the buttons inside the floating box */
+.action-btn {
+    font-size: 12px;
+    margin: 0 5px;
+    text-decoration: none !important;
+    font-weight: bold;
+}
+
+.action-btn i {
+    margin-right: 3px;
+}
+
+/* Animation for a smooth "pop-up" effect */
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 5px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/************************ */
+
 
 .pharmacypagination {
   width: 100%;
@@ -298,8 +394,6 @@ a {
 /*+++++++++++++++++++ 
     Generatebill Page 
 +++++++++++++++++++++++*/
-
-
 
 .generateBill {
   grid-column: 1 / -1; /* span full grid width */
@@ -318,9 +412,6 @@ a {
   padding: 12px 0;
   background-color: #e7d9d9;  
 }
-
-
-
 
 .topSection {
   width: 100%;
@@ -470,9 +561,7 @@ a {
 
 /* hospital & doctor details */
 
-
 .medicineHospital {
-
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
@@ -639,22 +728,45 @@ a {
 
 .sectionPatientName{
   position: relative;
+ 
+  width: 600px;
     
 }
 
 .sectionPatientName input {
     padding: 10px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 2px;
     font-size: 14px;
     background-color: white;
     /* cursor: pointer; */
     margin-left:6px;
+    width: 100%;
 }
+
+.open_PatientModal {
+  padding:10px 20px;
+  cursor: pointer;
+  border-radius: 2px;
+  outline: none;
+  border: none;
+  background-color: white;
+  
+}
+
+
+#prescriptionNo {
+  width:400px;
+  padding: 12px 20px;
+  border: none;
+  outline: none;
+}
+
+
 
 .generateBillBtnContainer {
   color:#f44336;
-  font-size: 26px;
+  font-size: 32px;
   text-decoration: none;
   font-weight: bold;
   
@@ -663,7 +775,27 @@ a {
 
 .close-btn:hover {
   color: darkred;
+ 
 }
+
+
+#addRowBtn {
+  padding: 8px 6px;
+  background-color:#a80f1b;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  border-radius: 2px;
+}
+
+#addRowBtn:hover {
+  
+  background-color:#9c2731;
+  
+}
+
+
 
 
 /* .sectionDoctorLeft {
@@ -883,54 +1015,74 @@ input[readonly] {
 /* Add Patient Pop Up Page */
 
 /* Hide modal by default */
-.modal-overlay {
-  display: none; 
+
+
+.generateModalOverlay {
+  display: none; /* Hidden by default */
   position: fixed;
-  z-index: 9999; /* Sit on top of everything */
-  left: 0;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5); /* Dimmed background */
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* The actual white box */
-.modal-content {
-  background-color: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  width: 100%;
-  max-width: 86%;
-  max-height: 80vh;
-  overflow-y: auto;
+.generateModalOverlay .modal-content {
+  background-color: white;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 80%;
+  max-width: 1200px; /* Optional: prevents it from being too wide on large screens */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
-
-
 
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 0;
-}
+
+
 
 .close-modal {
+  font-size: 28px;
   cursor: pointer;
-  font-size: 24px;
+  color: #666;
+  line-height: 1;
 }
 
 
+
+.close-modal:hover {
+  color: #000;
+}
+
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+
+
+
+/* ********************************************************** */
 
 
 .patientNames {
@@ -1155,8 +1307,8 @@ input[readonly] {
   cursor: pointer;
 }
 
-.btn-save {
-  background: #530505;
+.generateSaveBtn {
+  background: #a80f1b;
   color: #fff;
   padding: 8px 16px;
   border: none;
@@ -1407,95 +1559,6 @@ input[readonly] {
 }
 
 
-/* .billingtable {
-    width: 100%;
-    border-collapse: collapse;
-} */
-
-.billingtable {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 1000px; /* Set minimum width for table */
-}
-
-
-
-
-/* .billingtable thead {
-    background: linear-gradient(135deg, #a80f1b 0%, #764ba2 100%);
-} */
-
-.billingtable thead {
-  background: linear-gradient(135deg, #a80f1b 0%, #764ba2 100%);
-}
-
-
-.billingtable th {
-  padding: 12px 8px;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-/* .billingtable th {
-    padding: 16px 12px;
-    text-align: left;
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-} */
-
-
-/* .billingtable tbody tr {
-    border-bottom: 1px solid #f0f2f5;
-    transition: all 0.2s ease;
-} */
-
-.billingtable tbody tr {
-  border-bottom: 1px solid #f0f2f5;
-  transition: all 0.2s ease;
-}
-
-/* .billingtable tbody tr:hover {
-    background: #f8f9fa;
-    transform: scale(1.001);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-} */
-
-.billingtable tbody tr:hover {
-  background: #f8f9fa;
-}
-
-
-.billingtable tbody tr:last-child {
-    border-bottom: none;
-}
-
-/* .billingtable td {
-    padding: 14px 12px;
-    font-size: 14px;
-    color: #2c3e50;
-} */
-
-.billingtable td {
-  padding: 10px 8px;
-  font-size: 12px;
-  color: #2c3e50;
-  white-space: nowrap; /* Prevent text wrapping */
-}
-
-/* .text-success {
-    color: #28a745 !important;
-    font-weight: 600;
-} */
-
 .text-success {
   color: #28a745 !important;
   font-weight: 600;
@@ -1573,10 +1636,589 @@ input[readonly] {
 
 
 
+/*****************
+ Hide  modal on medicinesearch.html page first. 
+when I click addmedicine, then it shoud pop out 
+****************************/
+/* Add Medicine Modal Styles */
+#addMedicineModal,
+.modalAddMedicine {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-add-medicine {
+  background-color: #fefefe;
+  margin: 3% auto;
+  padding: 0;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 86%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s;
+ 
+}
 
 
 
 
 
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header-add-medicine {
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color:#a80f1b;
+  
+}
+
+.modal-header-add-medicine h2 {
+  margin: 0;
+  /* color: #333; */
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.modal-header-add-medicine .close {
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+  color: #ffffff;
+  /* color: #aaa; */
+}
+
+.modal-header-add-medicine .close:hover,
+.modal-header-add-medicine .close:focus {
+  /* color: #000; */
+  color: #cfc6c6;
+  
+}
+
+.modal-content-add-medicine .form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.modal-content-add-medicine .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content-add-medicine .form-group label {
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.modal-content-add-medicine .required {
+  color: #e74c3c;
+}
+
+.modal-content-add-medicine .form-group input,
+.modal-content-add-medicine .form-group select {
+  /* padding: 10px 12px; */
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  /* font-size: 14px; */
+  font-size: 12px;
+  transition: border-color 0.3s;
+}
+
+.modal-content-add-medicine .form-group input:focus,
+.modal-content-add-medicine .form-group select:focus {
+  outline: none;
+  /* border-color: #3498db; */
+  border-color: #a80f1b;
+}
+
+.modal-content-add-medicine .modal-footer {
+  padding: 20px 30px;
+  /* border-top: 1px solid #e0e0e0; */
+  border-top: 1px solid #a80f1b;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-content-add-medicine .btn-cancel,
+.modal-content-add-medicine .btn-submit {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-content-add-medicine .btn-cancel {
+  background-color: #ecf0f1;
+  color: #555;
+}
+
+.modal-content-add-medicine .btn-cancel:hover {
+  background-color: #d5dbdb;
+}
+
+.modal-content-add-medicine .btn-submit {
+  /* background-color: #3498db; */
+  background-color: #a80f1b;
+  color: white;
+}
+
+.modal-content-add-medicine .btn-submit:hover {
+  background-color: #c41322;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-content-add-medicine .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content-add-medicine {
+    width: 95%;
+    margin: 5% auto;
+  }
+}
+
+/******************
+purchasemedicine.html page 
+**********************/
+
+.purchaseMedicineCategory.purchaseMedicineRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.purchaseMedicineInput,
+.purchaseMedicineAvailable {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* Allows flex items to shrink below content size */
+}
+
+.purchaseMedicineInput label,
+.purchaseMedicineAvailable label {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.purchaseMedicineInput select,
+.purchaseMedicineInput input,
+.purchaseMedicineAvailable input {
+  padding: 5px 6px;
+  border: 1px solid #ccc;
+  /* border-radius: 4px; */
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.purchaseMedicineInput select:focus,
+.purchaseMedicineInput input:focus,
+.purchaseMedicineAvailable input:focus {
+  outline: none;
+  border-color: #a80f1b;
+}
+
+
+/* stylize top section */
+
+.purchaseMedicineAddSupplier {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  background-color: #a80f1b;
+  padding: 15px 0;
+}
+
+.sectionSupplierName {
+  flex: 1;
+  margin-left:4px;
+}
+
+.sectionSupplierName select {
+  width: 40%;
+  padding: 6px 12px;
+  border: 1px solid #ccc; 
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.sectionSupplierName select:focus {
+  outline: none;
+  border-color: #a80f1b;
+  box-shadow: 0 0 0 3px rgba(168, 15, 27, 0.1);
+}
+
+
+.sectionSupplierName select:hover {
+  border-color: #a80f1b;
+}
+
+
+.purchaseMedicineBtnClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  /* background-color: #dc3545; */
+  color: white !important;
+  border-radius: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.purchaseMedicineBtnClose:hover {
+  cursor: pointer;
+}
+
+
+
+.purchaseTopSection {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 2px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+
+.leftTopRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+
+.billNo {
+  display: flex; 
+  align-items: center;
+  gap: 5px;
+}
+
+.billNo label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+
+.billNo input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  
+  font-size: 14px;
+  min-width: 200px;
+  transition: border-color 0.3s;
+}
+
+.billNo input:focus {
+  outline: none;
+  border-color: #a80f1b;
+  box-shadow: 0 0 0 3px rgba(168, 15, 27, 0.1);
+}
+
+.rightTopRow {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  padding: 8px 12px;
+  background-color: #fff;  
+  border-radius: 4px;
+}
+
+
+.purchaseMedicineLower {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 30px;
+  padding: 20px;
+  background-color: #fff;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Left Column - Note Section */
+.purchaseleftNote {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.purchaseleftNote > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.purchaseleftNote textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s;
+}
+
+.purchaseleftNote textarea:focus {
+  outline: none;
+  border-color: #a80f1b;
+  box-shadow: 0 0 0 3px rgba(168, 15, 27, 0.1);
+}
+
+.purchaseleftNote input[type="file"] {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+/* .purchaseleftNote input[type="file"]:hover {
+  border-color: #a80f1b;
+} */
+
+.purchaseleftNote input[type="file"] {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+}
+
+.purchaseleftNote input[type="file"]:hover {
+  border: 1px solid #c2c8cf;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(168, 15, 27, 0.05),
+    rgba(168, 15, 27, 0.05) 10px,
+    rgba(255, 255, 255, 0.05) 10px,
+    rgba(255, 255, 255, 0.05) 20px
+
+   
+  );
+  background-size: 40px 40px;
+  animation: zebraCrossing 0.8s linear infinite;
+}
+
+@keyframes zebraCrossing {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 40px;
+  }
+}
+
+/* Right Column - Totals Section */
+
+.purchaseRightNote {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Row One  */
+
+.purchaseRightNote .purchaseMedicineRowOne, 
+.purchaseRightNote .purchaseMedicineRowTwo,
+.purchaseRightNote .purchaseMedicineRowThree,
+.purchaseRightNote .purchaseMedicineRowFour{
+  display: flex;
+  justify-content: space-between;
+}
+
+.purchaseRightNote input {
+  width: 100%;
+  padding: 8px 12px;
+  border: none; /* Remove all borders */
+  border-bottom: 1px solid #d1d5db; /* Only bottom border */
+  border-radius: 0; /* Remove border radius for cleaner look */
+  font-size: 13px;
+  transition: border-color 0.3s;
+  background-color: transparent; /* Optional: makes it look more minimal */
+}
+
+.purchaseRightNote select,
+.purchaseRightNote .paymentMedicineInput {
+
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.3s;
+
+}
+
+.purchaseRightNote input:focus {
+  outline: none;
+  border-color: #a80f1b;
+  box-shadow: 0 0 0 3px rgba(168, 15, 27, 0.1);
+} 
+
+
+
+/* The parent container holds both columns */
+.purchaseMedicineRowFive {
+    display: flex;
+    justify-content: space-between; /* Pushes them to the edges */
+    gap: 20px;                      /* Creates a gap between columns */
+    align-items: flex-end;         /* Ensures inputs align at the bottom */
+    width: 100%;
+    margin-bottom: 15px;
+    
+}
+
+/* Each column takes up equal space */
+.purchaseMedicineRowFiveLeft, 
+.purchaseMedicineRowFiveRight {
+    flex: 1;                       /* Makes both columns equal width */
+    display: flex;
+    flex-direction: column;        /* Keeps label above the input */
+    gap: 5px;                      /* Space between text and input */
+}
+/* Ensure the select and input stretch to fill their column */
+.purchaseMedicineRowFive select, 
+.paymentMedicineInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;        /* Prevents padding from breaking width */
+}
+
+.purchaseMedicineText {
+    /* font-weight: bold; */
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .purchaseMedicineRowFive {
+        flex-direction: column; /* Stacks them on small screens */
+    }
+}
+
+/* Row Six */
+/* Parent Container */
+.purchaseMedicineRowSix {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between the label and the textarea */
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Label styling */
+.purchaseMedicineText {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Textarea wrapper and field */
+.purchaseMedicinePayModeNote textarea {
+    width: 100%;
+    min-height: 80px; /* Gives it enough height for notes */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit; /* Ensures font matches the rest of the form */
+    box-sizing: border-box; /* Prevents padding from breaking width */
+    resize: vertical; /* Allows user to expand height, but not width */
+}
+
+/* Optional: Highlight on focus */
+.purchaseMedicinePayModeNote textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Stylize button for adding column in the purchasemedicine.html */
+
+.purchaseMediceAddRowBtn {
+  display: inline-flex;
+  align-items: center;
+  /* gap: 8px; */
+  padding-right:4px; 
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  color: #a80f1b;
+  /* border: none;
+  border-radius: 8px; */
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.purchaseMedicineDeleteRowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* width: 35px; */
+  /* height: 35px; */
+  /* background: #ef4444; */
+  /* color: white; */
+  color: #a80f1b;
+  border: none;
+  border-radius: 6px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
 
 

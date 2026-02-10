@@ -22,13 +22,50 @@ from patients.models import Patient
 from doctors.models import Doctor
 from pharmacy.models import Drug
 
-
+# billing/views.py
+from django.db.models import Sum
+from .models import Payment
 
 @login_required
 def billings_home(request):
     # Get all billings from the database
     billings = Invoice.objects.all()   
     return render(request, 'billings/billings.html', {'billings': billings})
+
+
+
+
+def billings_home(request):
+    # Calculate total income specifically for the billing home page
+    total_income = Payment.objects.filter(invoice__status='PAID').aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # ... your other logic ...
+    return render(request, 'billing/home.html', {'total_income': total_income})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

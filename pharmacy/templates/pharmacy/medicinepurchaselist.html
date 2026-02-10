@@ -1,0 +1,185 @@
+{% extends "base.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<!-- <aside class="sidebar">
+  <ul>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Billing</a></li>
+    <li><a href="#">Appointments</a></li>
+    <li><a href="#">OPD - Out Patient</a></li>
+    <li><a href="#">IPD - In Patient</a></li>
+    <li><a href="{% url 'pharmacy' %}">Pharmacy</a></li>
+    <li><a href="#">Laboratory</a></li>
+    <li><a href="#">Radiology</a></li>
+    <li><a href="#">Blood Bank</a></li>
+    <li><a href="#">Ambulance</a></li>
+    <li><a href="#">Front Office</a></li>
+  </ul>
+</aside> -->
+
+<aside class="sidebar">
+  <ul>
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'billings' %}">Billing</a></li>
+    <li><a href="#">Appointments</a></li>
+    <li><a href="#">OPD - Out Patient</a></li>
+    <li><a href="#">IPD - In Patient</a></li>
+    <li><a href="#">Pharmacy</a></li>
+    <li><a href="#">Laboratory</a></li>
+    <li><a href="#">Radiology</a></li>
+    <li><a href="#">Blood Bank</a></li>
+    <li><a href="#">Ambulance</a></li>
+    <li><a href="#">Front Office</a></li>
+
+
+
+    <li><a href="#">Birth & Death Record</a></li>
+    <li><a href="#">Human Resourc</a></li>
+    <li><a href="#">Duty Roster</a></li>
+    <li><a href="#">Annual Calendar</a></li>
+    <li><a href="#">Referrals</a></li>
+    <li><a href="#">Insurance Management</a></li>
+    <li><a href="#">Finance</a></li>
+    <li><a href="#">Messaging</a></li>
+    <li><a href="#">Inventory</a></li>
+    <li><a href="#">Download Center</a></li>
+
+
+    <li><a href="#">Certificate</a></li>
+    <li><a href="#">Front CMS</a></li>
+    <li><a href="#">Live Consultation</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Setup</a></li>
+
+
+
+
+
+  </ul>
+</aside>
+
+<main class="content">
+  <div class="pharmacy">
+    <div class="pharmacyheader">
+      <div><h1>Medicine Purchase List</h1></div>
+      <div>
+        
+        <a href="{% url 'purchasemedicine' %}"><button>+Purchase Medicine</button></a>
+      </div>
+    </div>
+
+    <div class="pharmacysearch">
+      <div>Search drug</div>
+
+      <div>
+       
+
+        <!-- Per page selector -->
+        <form method="GET" style="display: inline;">
+          <select name="per_page" onchange="this.form.submit()">
+            <option value="20" {% if request.GET.per_page == '20' or not request.GET.per_page %}selected{% endif %}>20</option>
+            <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+            <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
+          </select>
+        </form>
+        
+        <span><button>Excel</button></span>
+        <span><button>CSV</button></span>
+        <span><button>PDF</button></span>
+        <span><button>Print</button></span>
+      </div>
+    </div>
+
+ 
+
+    <div class="pharmacytable">
+      <!-- Display data  -->
+
+      <table class="billingtable">
+        <thead>
+          <tr>
+            <th>Purchase No#</th>
+            <th>Purchase Date</th>
+            <th>Bill No</th>
+            <th>Measure**</th>
+            <th>Supplier Name</th>
+            <th>Qty</th>
+            <th>Cost Price (Kshs)</th>
+            <th>Total Amount(Kshs)</th>
+            <th>Tax(%)</th>
+            <th>Discount (Kshs)</th>
+            <th>Net Amount (Kshs)</th>
+           
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for item in purchases %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.purchase.purchase_date|date:"Y-m-d" }}</td>
+            <td>{{ item.purchase.invoice_number }}</td>
+            <td>{{ item.purchase.drug.name }} ({{ item.purchase.drug.strength }})</td>
+            <td>{{ item.purchase.supplier.name }}</td>
+            <td>{{ item.purchase.quantity }}</td>
+            <td>{{ item.purchase.cost_price|floatformat:2 }}</td>
+            <td>{{ item.total_amount|floatformat:2 }}</td>
+            <td>{{ item.tax_percentage|floatformat:2 }}</td>
+            <td>{{ item.discount|floatformat:2 }}</td>
+            <td>{{ item.net_amount|floatformat:2 }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="11">No medicine purchases found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+      
+      
+       
+      </table>
+    </div>
+
+    <div class="pharmacypagination">
+      <div class="records-info">
+        Records: {{ purchases.start_index }} to {{ purchases.end_index }} of {{ total_records }}
+      </div>
+
+      <div class="pagination-controls">
+        {% if purchases.has_previous %}
+          <a href="?page=1&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">«</a>
+          <a href="?page={{ purchases.previous_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">‹</a>
+        {% else %}
+          <span class="pagination-btn disabled">«</span>
+          <span class="pagination-btn disabled">‹</span>
+        {% endif %}
+        
+        <!-- Page numbers -->
+        {% for num in purchases.paginator.page_range %}
+          {% if num == purchases.number %}
+            <span class="pagination-btn active">{{ num }}</span>
+          {% elif num > purchases.number|add:'-3' and num < purchases.number|add:'3' %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == 1 or num == purchases.paginator.num_pages %}
+            <a href="?page={{ num }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">{{ num }}</a>
+          {% elif num == purchases.number|add:'-3' or num == purchases.number|add:'3' %}
+            <span class="pagination-ellipsis">...</span>
+          {% endif %}
+        {% endfor %}
+        
+        {% if purchases.has_next %}
+          <a href="?page={{ purchases.next_page_number }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">›</a>
+          <a href="?page={{ purchases.paginator.num_pages }}&per_page={{ request.GET.per_page|default:'20' }}" class="pagination-btn">»</a>
+        {% else %}
+          <span class="pagination-btn disabled">›</span>
+          <span class="pagination-btn disabled">»</span>
+        {% endif %}
+      </div>
+    </div>
+
+ </div>
+</main>
+
+{% endblock %}

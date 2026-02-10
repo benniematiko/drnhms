@@ -2,10 +2,12 @@
 {% block title %}Dashboard{% endblock %} 
 {% block content %}
 
+
+
 <aside class="sidebar">
   <ul>
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="#">Billing</a></li>
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'billings' %}">Billing</a></li>
     <li><a href="#">Appointments</a></li>
     <li><a href="#">OPD - Out Patient</a></li>
     <li><a href="#">IPD - In Patient</a></li>
@@ -15,6 +17,31 @@
     <li><a href="#">Blood Bank</a></li>
     <li><a href="#">Ambulance</a></li>
     <li><a href="#">Front Office</a></li>
+
+
+
+    <li><a href="#">Birth & Death Record</a></li>
+    <li><a href="#">Human Resourc</a></li>
+    <li><a href="#">Duty Roster</a></li>
+    <li><a href="#">Annual Calendar</a></li>
+    <li><a href="#">Referrals</a></li>
+    <li><a href="#">Insurance Management</a></li>
+    <li><a href="#">Finance</a></li>
+    <li><a href="#">Messaging</a></li>
+    <li><a href="#">Inventory</a></li>
+    <li><a href="#">Download Center</a></li>
+
+
+    <li><a href="#">Certificate</a></li>
+    <li><a href="#">Front CMS</a></li>
+    <li><a href="#">Live Consultation</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Setup</a></li>
+
+
+
+
+
   </ul>
 </aside>
 
@@ -26,12 +53,17 @@
         <a href="{% url 'generatebill' %}">
           <button>+Generate a Bill</button>
         </a>
-        <a href=""><button>Medicines</button></a>
+        <a href="{% url 'medicinesearch' %}"><button>Medicines</button></a>
       </div>
     </div>
 
     <div class="pharmacysearch">
-      <div>Search drug</div>
+      <div>
+
+        <label>Search drug</label>
+        <input type="text" placeholer="Searct a bill" />
+
+      </div>
 
       <div>
        
@@ -65,18 +97,26 @@
             <th>Date</th>
             <th>Patient Name</th>
             <th>Doctor Name</th>
-            <th>Discount (Kshs)</th>
-            <th>Net Amount (Kshs)</th>
-            <th>Paid Amount (Kshs)</th>
-            <th>Refund Amount (Kshs)</th>
-            <th>Balance Amount (Kshs)</th>
+            <th>Disc (Kshs)</th>
+            <th>Net Amt (Kshs)</th>
+            <th>Paid Amt (Kshs)</th>
+            <th>Refund Amt (Kshs)</th>
+            <th>Bal Amt (Kshs)</th>
           </tr>
         </thead>
 
         <tbody>
           {% for invoice in invoices %}
           <tr>
-            <td>{{ invoice.invoice_number }}</td>
+
+
+            
+
+
+
+            <td>
+              {{ invoice.invoice_number }}
+            </td>
             <td>{{ invoice.patient.case_id }}</td>
             <td>{{ invoice.created_at|date:"Y-m-d" }}</td>
 
@@ -100,12 +140,34 @@
               {{ invoice.refund_amount|floatformat:2 }}
             </td>
 
-            <!-- <td>{{ invoice.balance_amount }|floatformat:2}</td> -->
-            <td
-              class="{% if invoice.balance_amount > 0 %}text-danger{% endif %}"
-            >
-              {{ invoice.balance_amount|floatformat:2 }}
-            </td>
+            
+            <!-- <td class="{% if invoice.balance_amount > 0 %}text-danger{% endif %}" >
+              {{ invoice.balance_amount|floatformat:2 }}   
+        
+              <span class="row-action-container">               
+                
+                <span class="row-actions">
+                    <a href="" class="action-btn view" title="View"><i class="fas fa-eye"></i>View</a>
+                    <a href="" class="action-btn print" title="Print"><i class="fas fa-print"></i>Print</a>
+                    <a href="" class="action-btn add" title="Add Payment"><i class="fas fa-plus"></i>Add Payment</a>
+                </span>
+              </span>
+
+            </td> -->
+
+            <td class="balance-cell {% if invoice.balance_amount > 0 %}text-danger{% endif %}">
+              <span class="balance-value">{{ invoice.balance_amount|floatformat:2 }}</span>
+              
+              <span class="row-action-container">
+                  <span class="row-actions">
+                      <a href="#" class="action-btn view" title="View"><i class="fas fa-eye">V</i></a>
+                      <a href="#" class="action-btn print" title="Print"><i class="fas fa-print">P</i></a>
+                      <a href="#" class="action-btn add" title="Add Payment"><i class="fas fa-plus">PAY</i></a>
+                  </span>
+              </span>
+          </td>
+
+            
           </tr>
           {% empty %}
           <tr>

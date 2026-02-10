@@ -6,16 +6,25 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.db import transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from billing.models import Invoice, InvoiceItem, Payment
 from .models import DrugCategory, Drug
 from doctors.models import Doctor
 from patients.models import Patient
-
 from decimal import Decimal
 import json
 import uuid
 from datetime import datetime
+from pharmacy.models import Supplier
+from .models import DrugPurchase
+
+# Save data into the database from purchasemedicine.html
+
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+
+
+# Display records on the medicinepurchaselist.html
+# from django.db.models import F, ExpressionWrapper, DecimalField
 
 
 @login_required
@@ -184,31 +193,37 @@ def generatebill(request):
     return render(request, 'pharmacy/generatebill.html', context)
 
 
-def get_medicines_by_category(request):
-    category_id = request.GET.get('category_id')
-    
-    if category_id:
-        try:
-            medicines = Drug.objects.filter(
-                category_id=category_id,
-                is_active=True
-            ).values('name').distinct().order_by('name')
-            
-            medicine_list = [{'id': med['name'], 'name': med['name']} for med in medicines]
-            return JsonResponse({'medicines': medicine_list})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    
-    return JsonResponse({'medicines': []})
+@login_required
+def get_medicines_by_category(request, category_id):
+    """Fetch medicines based on category ID from URL"""
+    try:
+        medicines = Drug.objects.filter(
+            category_id=category_id,
+            is_active=True
+        ).values('id', 'name').distinct().order_by('name')
+        
+        medicine_list = [{'id': med['id'], 'name': med['name']} for med in medicines]
+        return JsonResponse({
+            'status': 'success',
+            'medicines': medicine_list
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
 
-
+# view to handle medicine_id parameter:
+@login_required
 def get_batches_by_medicine(request):
-    medicine_name = request.GET.get('medicine_name')
+    medicine_id = request.GET.get('medicine_id')  # Changed from medicine_name
     
-    if medicine_name:
+    print(f"DEBUG: Searching batches for medicine_id: {medicine_id}")
+    
+    if medicine_id:
         try:
             batches = Drug.objects.filter(
-                name=medicine_name,
+                id=medicine_id,  # Changed to filter by ID
                 is_active=True,
                 stock_quantity__gt=0
             ).values(
@@ -221,13 +236,38 @@ def get_batches_by_medicine(request):
                 'unit'
             ).order_by('expiry_date')
             
-            return JsonResponse({'batches': list(batches)})
+            batch_list = list(batches)
+            print(f"DEBUG: Found {len(batch_list)} batches")
+            
+            if not batch_list:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No batches available for this medicine',
+                    'batches': []
+                })
+            
+            return JsonResponse({
+                'status': 'success',
+                'batches': batch_list
+            })
+            
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+            print(f"ERROR in get_batches_by_medicine: {str(e)}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e),
+                'batches': []
+            })
     
-    return JsonResponse({'batches': []})
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Medicine ID is required',
+        'batches': []
+    })
 
 
+
+@login_required
 def get_patients(request):
     """Fetch patients based on search query"""
     query = request.GET.get('q', '')
@@ -254,7 +294,7 @@ def get_patients(request):
     
     return JsonResponse([], safe=False)
 
-
+@login_required
 def get_batches(request):
     drug_id = request.GET.get('drug_id')
     
@@ -267,3 +307,246 @@ def get_batches(request):
         return JsonResponse({'batches': batches})
     
     return JsonResponse({'batches': []})
+
+
+
+@login_required
+def medicinesearch(request):
+    drugs = Drug.objects.select_related('category', 'pharmacy').filter(is_active=True)
+    context = {
+        'drugs': drugs
+    }
+    return render(request, 'pharmacy/medicinesearch.html', context)
+
+
+
+# display drugs on the medicinesearch.html
+
+
+@login_required
+def drug_list(request):
+    drugs = Drug.objects.select_related('category', 'pharmacy').filter(is_active=True)
+    context = {
+        'drugs': drugs
+    }
+    return render(request, 'pharmacy/drug_list.html', context)
+
+
+
+# Getting suppliers and categories
+
+
+@login_required
+def purchasemedicine(request):
+    suppliers = Supplier.objects.all()
+    categories = DrugCategory.objects.all()    
+    print(f"Total suppliers: {suppliers.count()}")  # Debug    
+    for supplier in suppliers:
+        print(f"Supplier: {supplier.name}, Active: {supplier.is_active}")    
+    context = {
+        'suppliers': suppliers,
+        'categories': categories,
+    }    
+    return render(request, 'pharmacy/purchasemedicine.html', context)
+
+
+# @login_required
+# def medicinepurchaselist(request):
+   
+#     return render(request, 'pharmacy/medicinepurchaselist.html')
+
+
+# display data on the medicinepurchaselist.html page
+
+@login_required
+def medicinepurchaselist(request):
+    # Fetch all drug purchases with related data
+    purchases_list = DrugPurchase.objects.select_related(
+        'supplier', 
+        'drug', 
+        'drug__category'
+    ).order_by('-purchase_date')
+    
+    # Add calculations for each purchase
+    purchases_with_totals = []
+    for purchase in purchases_list:
+        total_amount = purchase.quantity * purchase.cost_price
+        # You can add tax calculation here if needed
+        tax_percentage = 0  # Modify as needed
+        tax_amount = total_amount * Decimal(tax_percentage) / 100
+        discount = Decimal('0.00')  # Modify as needed
+        net_amount = total_amount + tax_amount - discount
+        
+        purchases_with_totals.append({
+            'purchase': purchase,
+            'total_amount': total_amount,
+            'tax_percentage': tax_percentage,
+            'tax_amount': tax_amount,
+            'discount': discount,
+            'net_amount': net_amount,
+        })
+    
+    # Pagination
+    items_per_page = request.GET.get('per_page', 20)
+    paginator = Paginator(purchases_with_totals, items_per_page)
+    
+    page = request.GET.get('page', 1)
+    try:
+        purchases = paginator.page(page)
+    except PageNotAnInteger:
+        purchases = paginator.page(1)
+    except EmptyPage:
+        purchases = paginator.page(paginator.num_pages)
+    
+    context = {
+        'purchases': purchases,
+        'total_records': paginator.count,
+    }
+    
+    return render(request, 'pharmacy/medicinepurchaselist.html', context)
+
+
+# save date from purchasemedicine.html page
+
+@login_required
+def save_drug_purchase(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            
+            # 1. Parse the date string you created (MM-DD-YYYY HH:MM AM/PM)
+            date_str = data.get('purchase_date')
+            clean_date = datetime.strptime(date_str, '%m-%d-%Y %I:%M %p').date()
+
+            # 2. Get the objects
+            drug = Drug.objects.get(id=data.get('drug_id'))
+            supplier = Supplier.objects.get(id=data.get('supplier_id'))
+
+            # 3. Create the DrugPurchase record
+            # Your model's save() method will automatically increase the stock!
+            purchase = DrugPurchase.objects.create(
+                supplier=supplier,
+                drug=drug,
+                quantity=int(data.get('amount')), # Or however you define quantity
+                cost_price=data.get('amount'), 
+                purchase_date=clean_date,
+                invoice_number=data.get('bill_no')
+            )
+
+            return JsonResponse({'status': 'success', 'purchase_id': purchase.id})
+        
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+
+# SAVE DATA INTO DATABASE IN THE purchasemedicine.html page
+
+def purchase_medicine_form(request):
+    """Display the purchase medicine form"""
+    suppliers = Supplier.objects.filter(is_active=True)
+    categories = DrugCategory.objects.all()
+    
+    context = {
+        'suppliers': suppliers,
+        'categories': categories,
+    }
+    return render(request, 'pharmacy/purchasemedicine.html', context)
+
+
+@csrf_exempt
+def save_medicine_purchase(request):
+    """Save medicine purchase data"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Extract main form data
+            supplier_id = data.get('supplier_id')
+            bill_no = data.get('bill_no')
+            purchase_date = data.get('purchase_date')
+            medicines = data.get('medicines', [])
+            note = data.get('note', '')
+            
+            # Validate required fields
+            if not supplier_id or not medicines:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Supplier and at least one medicine are required'
+                }, status=400)
+            
+            # Get supplier
+            try:
+                supplier = Supplier.objects.get(id=supplier_id)
+            except Supplier.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid supplier selected'
+                }, status=400)
+            
+            # Use transaction to ensure all saves succeed or none do
+            with transaction.atomic():
+                purchase_records = []
+                
+                for medicine in medicines:
+                    drug_id = medicine.get('drug_id')
+                    quantity = int(medicine.get('quantity', 0))
+                    purchase_price = Decimal(medicine.get('purchase_price', 0))
+                    batch_no = medicine.get('batch_no', '')
+                    expiry_date = medicine.get('expiry_date')
+                    
+                    # Get or create drug
+                    try:
+                        drug = Drug.objects.get(id=drug_id)
+                        
+                        # Update drug details
+                        drug.batch_number = batch_no
+                        drug.expiry_date = expiry_date
+                        if medicine.get('sale_price'):
+                            drug.unit_price = Decimal(medicine.get('sale_price'))
+                        drug.save()
+                        
+                    except Drug.DoesNotExist:
+                        return JsonResponse({
+                            'status': 'error',
+                            'message': f'Drug with id {drug_id} not found'
+                        }, status=400)
+                    
+                    # Create purchase record
+                    purchase = DrugPurchase.objects.create(
+                        supplier=supplier,
+                        drug=drug,
+                        quantity=quantity,
+                        cost_price=purchase_price,
+                        invoice_number=bill_no
+                    )
+                    purchase_records.append(purchase)
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': f'Successfully saved {len(purchase_records)} medicine purchase(s)',
+                    'bill_no': bill_no
+                })
+                
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid JSON data'
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    }, status=405)
+
+
+
+
+

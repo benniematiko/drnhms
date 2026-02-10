@@ -11,11 +11,13 @@ from django.db.models import Sum
 
 
 
+class Invoice(models.Model):   
 
+    INVOICE_TYPE = (
+        ('OPD', 'Out Patient'),
+        ('IPD', 'In Patient'),
+    )
 
-
-
-class Invoice(models.Model):
     PAYMENT_STATUS = (
         ('PENDING', 'Pending'),
         ('PAID', 'Paid'),
@@ -26,6 +28,9 @@ class Invoice(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT)
     doctor = models.ForeignKey(Doctor, on_delete=models.PROTECT)    
     invoice_number = models.CharField(max_length=30, unique=True)
+    # sum of sales on dashboard.html
+    invoice_type = models.CharField(max_length=3, choices=INVOICE_TYPE, default='OPD')
+    
     status = models.CharField(max_length=10, choices=PAYMENT_STATUS, default='PENDING')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     discount_amount = models.DecimalField(max_digits=12,decimal_places=2,default=0.00)

@@ -4,237 +4,239 @@
 
 <div class="generateBill">
 
-  <div class="topSection">
-    <div class="topRow">
-      <div class="leftTopRow">
-        <div class="billNo">Bill No 1831</div>
-        <div class="caseId">Case ID</div>
-      </div>
-      <div class="rightTop">Date/Time</div>
-    </div>
-  </div>
+  <form id="billForm">
+    {% csrf_token %}
 
+    <div class="purchaseMedicineAddSupplier">      
 
+      <div class="sectionSupplierName">   
+          <label for="supplierName"></label>    
+          <select id="supplierName" class="supplierName" name="supplier_name">
+            <option value="">--- Select Supplier ---</option>
+            {% for supplier in suppliers %}
+              <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+            {% empty %}
+              <option value="">No suppliers found</option>  
+            {% endfor %}
+          </select>       
+      </div>     
 
-  <div class="medicineCategory">
-
-    <div class="medicineInput">
-      Medicine Category*
-      <select>
-        <option>Option</option>
-        <option>A</option>
-        <option>B</option>
-      </select>
-    </div>
-
-    <div class="medicineInput">
-      Medicine Name*
-      <select>
-        <option>Select</option>
-        <option>A</option>
-        <option>B</option>
-      </select>
-    </div>
-
-    <div class="medicineInput">
-      Batch No*
-      <input type="text" />
-    </div>
-
-    <div class="medicineInput">
-      Expiry Date*
-
-      <input
-        type="text"
-        id="invoice-number"
-        name="invoice_number"
-        value="INV-00123"
-        readonly
-      />
-    </div>
-
-    <div class="medicineInput">
-      Quantity * | Available Qty
-
-
-      <div class="quantityAvailable">
-         <div class="medicineQuantity">
-         <input type="text" id="invoice-number" name="invoice_number" value="" />
-        </div>
-        <div class="medicineAvailable">
-          <input type="text" id="invoice-number" name="invoice_number" value="1" readonly />        
-        </div>
-      </div>
-
-
-    </div>
-
-    <div class="medicineInput">
-      Sales Price(Kshs) * Tax
-
-      <div class="salesTax">
-
-        <div class="medicineSales">
-          <input
-              type="text"
-              id="invoice-number"
-              name="invoice_number"
-              value="1"
-              readonly
-            />
-        </div>
-
-        <div class="medicineTax">
-          <input
-              type="text" id="invoice-number" name="invoice_number" value="1" readonly />
-        </div>
-
+      <div class="purchaseMedicineBtnContainer">
+        <a class="purchaseMedicineBtnClose" href="{% url 'medicinepurchaselist' %}" 
+        style="cursor: pointer; text-decoration: none; color: inherit" >
+          ×
+        </a>
       </div>
 
     </div>
 
-    <div class="medicineInput">     
+    <div class="purchaseTopSection">  
+        <div class="leftTopRow">
+          <div class="billNo">
+            <label for="purchaseMedicineBillNo">
+              Bill No
+            </label>
+            <input type="text" class="purchaseMedicineBillNo" id="purchaseMedicineBillNo" name="purchaseMedicineBill_No" />
+          </div>
+         
+        </div>
+        <!-- <div id="purchaseMedicineCurrDate" class="rightTopRow ">Date/Time</div> -->
+
+        <div class="rightTopRow">
+            <label for="purchaseMedicineDateInput">Purchase date</label>
+            <input type="text" class="purchaseMedicineDateInput" id="purchaseMedicineDateInput" name="purchase_date" readonly 
+                  style="border: none; background: transparent; font-weight: bold;">
+        </div>
       
-      Amount ( Kshs) *
-      <div class="amountT">
-
-        <div class="medicineAmount">
-          <input type="text" id="invoice-number" ame="invoice_number" value="1" readonly />
-        </div>
-
-        <div class="medicineDeleteRow">
-          <button>X</button>
-        </div>
-
-
-      </div>
     </div>
 
     
 
+    <div id="purchaseMedicineRowsContainer" class="purchaseMedicineRowsContainer">
 
+      <div class="purchaseMedicineCategory purchaseMedicineRow">
 
-  </div>
+        <div class="purchaseMedicineInput">
+          <label for="purchaseMedicineCategory"> Medicine Category*</label>
+          <select id="purchaseMedicineCategory" class="purchaseMedicine_Category">
+            <option value="">---Select---</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
+        <div class="purchaseMedicineInput">
+          <label for="purchaseMedicineName">Medicine Name* </label>
+          <select id="purchaseMedicineName" class="purchaseMedicine_Name">
+            <option value="">---Select---</option>
+          </select>
+        </div>
 
-  <div class="medicineAddRow">
-    <div class="addRow">
-      <button>+ Add a Row</button>
-    </div>
-  </div>
+        <div class="purchaseMedicineInput">
+          <label for="purchaseMedicineBatchNo">Batch No*</label>
+          <input type="text" class="purchaseMedicineBatch_No" id="purchaseMedicineBatchNo"  required/>
+        </div>
 
-  <hr/>
+        <div class="purchaseMedicineInput">
+          <label for="purchaseMedicineExpiryDate">Expiry Date*</label>
+          <input type="date" name="expirydate" class="purchaseMedicineExpiry_Date" id="purchaseMedicineExpiryDate"  required/>
+        </div>
 
-  <div class="medicineHospital">
+        <div class="purchaseMedicineInput">
+          <label for="purchaseMedicineMRP">MRP(Kshs)*</label>
+          <input type="text" class="purchaseMedicine_MRP" id="purchaseMedicineMRP"  required/>
+        </div>
 
-      <div class="leftHospital">
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicineBatchAmount">Batch Amount(Kshs) *</label>
+          <input type="text" class="purchaseMedicineBatch_Amount" id="purchaseMedicineBatchAmount"  required />
+        </div>
 
-        <div class="leftHospitalRow">
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicineSalePrice">Sale Price*</label>
+          <input type="text" class="purchaseMedicineSale_Price" data-field="saleprice" id="purchaseMedicineSalePrice"  required/>
+        </div>
 
-          <div class="leftHospitalDoctor">
-            Hospital Doctor
-            <input text="text"/>  
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicinePackQty">Packing Qyt*</label>
+          <input type="text" class="purchaseMedicinePack_Qty" id="purchaseMedicinePackQty"  required/>
+        </div>
+
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicineQty">Quantity*</label>
+          <input type="text" class="purchaseMedicine_Qty" data-field="quantity" id="purchaseMedicineQty"  required/>
+                   
+
+        </div> 
+
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicinePrice">Purchase Price*</label>
+          <input type="number" class="purchaseMedicine_Price" id="purchaseMedicinePrice"  required/>
+        </div> 
+
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicineTaxRow">Tax*</label>
+          <input type="number" class="purchaseMedicineTax_Row" id="purchaseMedicineTaxRow" />
+        </div>
+
+        <div class="purchaseMedicineAvailable">
+          <label for="purchaseMedicineAmount">Amount*</label>
+          <input type="number" class="purchaseMedicine_Amount" id="purchaseMedicineAmount" readonly/>
+        </div> 
+
+        <div class="purchaseMediceAddRowBtn">
+          +
+        </div>
+
+      </div>
+
+      <hr />
+
+      <div class="purchaseMedicineLower purchaseMedicineLower">
+
+        <div class="purchaseleftNote">
+          <div>            
+            <label for="purchaseMedicineNote">Note*</label>
+            <textarea id="purchaseMedicineNote" class="purchaseMedicine_Note"></textarea>
           </div>
 
-          <div class="rightHospitalDoctor">
-            Doctor Name
-            <input text="text"/>   
+          <div>            
+            <label for="purchaseMedicineAttachment">Attach Document</label>
+            <input type="file" class="purchaseMedicine_Attachment" id="purchaseMedicineAttachment" />
+          </div>
+        </div>
+
+        <!-- Right column -->
+
+        <div class="purchaseRightNote">  
+
+          <div class="purchaseMedicineRowOne">
+            
+            <label class="paymentMedicineLabel" for="purchaseMedicineTotalAmount">
+              Total Amount (Kshs)
+            </label>
+
+            <div class="purchasemedicineInput">
+              <input type="number" id="purchaseMedicineTotalAmount"  class="purchaseMedicineTotal_Amount"
+              name="total_amount" placeholder="0" readonly />
+            </div>
+
           </div>
 
-        </div>  
+          <div class="purchaseMedicineRowTwo">
+            <div class="purchaseMedicineText">Discount</div>
+            <div class="" ><input  class="purchaseMedicineDisc_Perc" id="purchaseMedicineDiscPerc" placeholder="Discount %"/></div>            
+            <div>
+              <label class="paymentMedicineLabel" for="purchaseMedicineDiscount"></label>
+              <input type="number" id="purchaseMedicineDiscount" 
+              class="purchaseMedicine_Discount" name="purchaseMedicineDiscount" placeholder="0" readonly /></div>
+          </div>
+
+          <div class="purchaseMedicineRowThree">
+            <div class="purchaseMedicineText">Tax</div>
+            
+            <div> 
+              <label class="purchaseMedicineTax" for="purchaseMedicineTax"></label>
+              <input type="text" id="purchaseMedicineTax" class="purchaseMedicine_Tax" readonly />
+            </div>
+          </div>
+
+          <div class="purchaseMedicineRowFour">
+            <!-- <div class="purchaseMedicineText">Net Amount</div> -->
+            <label class="paymentMedicineLabel" for="purchaseMedicineNetAmount">Net Amount (Kshs)</label>
+            <div><input type="text" id="purchaseMedicineNetAmount" 
+                class="purchaseMedicineNet_Amount" readonly /></div>
+          </div>
+
+          <div class="purchaseMedicineRowFive">
+            <div class="purchaseMedicineRowFiveLeft">
+              <!-- <div class="purchaseMedicineText">Payment Mode</div> -->
+              <label class="paymentMedicinePaymentSelecMode" for="paymentMedicinePaymentSelecMode">Payment Mode</label>
+              <div>
+                <select id="paymentMedicinePaymentSelecMode" class="paymentMedicinePaymentSelec_Mode" >
+                  <option>---Select Payment Mode---</option>
+                  <option>Cash</option>
+                  <option>Cheque</option>
+                  <option>Bank To Bank</option>
+
+                </select>
+              </div>
+            </div>
+
+            <div class="purchaseMedicineRowFiveRight">
+              <!-- <div class="purchaseMedicineText">Payment Amount (Kshs) </div> -->
+              <label class="purchaseMedicineText" for="paymentMedicinePayAmount">Payment Amount (Kshs)</label>
+              <div><input class="paymentMedicinePay_Amount" id="paymentMedicinePayAmount" readonly /></div>
+            </div>
+          </div>
+
+          <div class="purchaseMedicineRowSix">
+            <div>
+              <!-- <div class="purchaseMedicineText">Payment Note</div> -->
+               <label class="purchaseMedicineText" for="purchaseMedicinePaymentNote">Payment Note </label>
+              <div class="purchaseMedicinePayModeNote">
+                <textarea class="purchaseMedicinePayment_Note" id="purchaseMedicinePaymentNote"></textarea>
+              </div>
+            </div>
+           
+          </div>
+          
+        </div>        
         
-        <div class="leftHospitalRowTwo">
-          Note
-
-          <textarea></textarea>
-         </div>
-
-
       </div>
 
-      <div class="rightHospital">
+    </div>  
 
-        <div class="rightHospitalRowOne">
-          <div>
-            Total(Kshs)
-          </div>
+    <!-- Left side of generatebill  -->
 
-          <div>
-            Here.................
-          </div>
-        </div>
-
-
-        <div class="rightHospitalRowTwo">
-          <div>
-            Discounts(Kshs)
-          </div>
-
-          <div>
-            ---------------
-          </div>
-
-          <div>
-            -----------------
-          </div>
-        </div>
-
-
-        <div class="rightHospitalRowThree">
-          <div>
-            Tax(Kshs)
-          </div>
-
-          <div>
-            Here.................
-          </div>
-        </div>
-
-         <div class="rightHospitalRowFour">
-          <div>
-            Net Amount(Kshs)
-          </div>
-
-          <div>
-            Here.................
-          </div>
-        </div>
-
-
-         <div class="rightHospitalRowFive">
-          <div>
-            Payment Mode 
-
-            <select>
-              <option>Cash</option>
-              <option>Cheque</option>
-              <option>MPESA</option>
-
-            </select>
-          </div>
-
-          <div>
-            Payment Amount
-
-            <input type="text" readonly />
-          </div>
-        </div>
+    <div class="generateBillButtons">
+      <div><button class="purchaseMedicineCancelBtn">Cancel</button></div>
+      <div>
+        <button id="purchaseMedicineSaveBtn" type="button">Save</button>
       </div>
-
-
-
-  </div>
-
-
-  <div class="generateBillButtons">
-    <div><button>Save & Print</button></div>
-    <div><button>Save</button></div>
-  </div>
-
-
-
-
- 
+    </div>
+  </form>
 </div>
 
 

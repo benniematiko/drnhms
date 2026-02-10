@@ -21,10 +21,10 @@
           <a href="{% url 'dashboard' %}">Dashboard</a>
 
           {% if user.is_authenticated %}
-          <a href="#">Patients</a>
+        
           <a href="{% url 'doctors' %}">Doctors</a>
           <a href="#">Appointments</a>
-          <a href="#">Payments</a>
+          
 
           <span class="welcome">Welcome, {{ user.username }}</span>
         

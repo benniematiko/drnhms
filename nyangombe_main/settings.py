@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'billing',
     'core',
     'dashboard',
+
+    # Add this line here:
+    'django.contrib.humanize',
     
 ]
 
