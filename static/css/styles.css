@@ -59,7 +59,8 @@ html {
   grid-area: header;
   display: flex;
   justify-content: space-between;
-  background-color: #2c3e50;
+  background-color: #2c3e50; 
+  /* background-color: #a80f1b; */
   color: #f0f0f0;
   padding: 20px;
 }
@@ -250,10 +251,41 @@ a {
   margin-bottom: 15px;
 }
 
+.generateBillBtn {
+  padding: 6px 12px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-color: #a80f1b;
+  color: #ffffff;
+}
 
-.pharmacysearch {
-  width: 100%; /* Changed from 99% */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+.generateBillBtn:hover {  
+  background-color: #942029; 
+}
+
+
+
+.generateMedicineBtn {
+  padding: 6px 12px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-color: #a80f1b;
+  color: #ffffff;
+}
+
+
+.generateMedicineBtn:hover {
+  background-color: #942029; 
+}
+
+
+/* .pharmacysearch {
+  width: 100%; 
+  justify-content: space-between; */
+  /* box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   margin-bottom: 25px;
   display: flex;
   justify-content: space-between;
@@ -261,8 +293,45 @@ a {
   flex-wrap: wrap;
   gap: 20px;
   background: white;
-  padding: 15px;
+  padding: 15px; */
   /* border-radius:48px; */
+/* } */
+
+  .pharmacysearch {
+    width:100%;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    gap: 20px;
+    padding: 10px 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(196, 168, 168, 0.08);   
+    flex-wrap: wrap;  
+    background-color: white;
+  }
+
+.pharmacyInputOne {  
+  flex: 1;  
+  padding: 10px 0; 
+}
+
+
+.pharmacyInputTwo {  
+  flex:1; 
+  /* background-color: rgb(162, 194, 19); */
+  padding: 10px 0;  
+  text-align: right;  
+  
+} 
+
+
+.searchBillInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 8px;
+  margin-left: 12px;
+  outline: none;
+  border-bottom:1px solid black;
 }
 
 .billingtable {
@@ -311,7 +380,7 @@ a {
 .billingtable tbody tr:hover {
     /* background: #f8f9fa; */
      background-color: #f8fbff !important;
-    transform: scale(1.003);
+    transform: scale(1.003); 
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     
 } 
@@ -2221,4 +2290,114 @@ purchasemedicine.html page
   line-height: 1;
 }
 
+/* Stylize textarea in the generatebill.html page */
 
+.generateNote {
+
+  width: 80%;
+
+}
+
+
+/***************************
+
+Add some styling for the age 
+inputs in the add new patient model 
+
+
+**************************/
+
+
+.age-inputs input {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+}
+
+/* Style for required field labels */
+label[for="generatePatientNameModal"],
+label[for="generateGenderModal"],
+label[for="generateBirthDateModal"] {
+    font-weight: normal;
+}
+
+/* Style for the modal footer buttons */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.generate_PatientCancelBtn,
+.generate_AddPatientSaveBtn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.generate_PatientCancelBtn {
+    background-color: #b94037;
+    color: white;
+}
+
+.generate_AddPatientSaveBtn {
+    background-color: #a80f1b;
+    color: white;
+}
+
+.generate_PatientCancelBtn:hover,
+.generate_AddPatientSaveBtn:hover {
+    opacity: 0.9;
+}
+
+.generate_AddPatientSaveBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+
+
+
+/* Flashing messages in the pharmacy.html or  generarebill.html */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-dismissible {
+    padding-right: 40px;
+    position: relative;
+}
+
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.messages {
+    margin-bottom: 20px;
+}

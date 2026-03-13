@@ -4,46 +4,21 @@
 
 
 
-<aside class="sidebar">
-  <ul>
-    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li><a href="{% url 'billings' %}">Billing</a></li>
-    <li><a href="#">Appointments</a></li>
-    <li><a href="#">OPD - Out Patient</a></li>
-    <li><a href="#">IPD - In Patient</a></li>
-    <li><a href="#">Pharmacy</a></li>
-    <li><a href="#">Laboratory</a></li>
-    <li><a href="#">Radiology</a></li>
-    <li><a href="#">Blood Bank</a></li>
-    <li><a href="#">Ambulance</a></li>
-    <li><a href="#">Front Office</a></li>
+<!-- Side bar here  -->
+{% include "sidebar.html" %}
 
 
-
-    <li><a href="#">Birth & Death Record</a></li>
-    <li><a href="#">Human Resourc</a></li>
-    <li><a href="#">Duty Roster</a></li>
-    <li><a href="#">Annual Calendar</a></li>
-    <li><a href="#">Referrals</a></li>
-    <li><a href="#">Insurance Management</a></li>
-    <li><a href="#">Finance</a></li>
-    <li><a href="#">Messaging</a></li>
-    <li><a href="#">Inventory</a></li>
-    <li><a href="#">Download Center</a></li>
-
-
-    <li><a href="#">Certificate</a></li>
-    <li><a href="#">Front CMS</a></li>
-    <li><a href="#">Live Consultation</a></li>
-    <li><a href="#">Reports</a></li>
-    <li><a href="#">Setup</a></li>
-
-
-
-
-
-  </ul>
-</aside>
+<!-- Display flash messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 <main class="content">
   <div class="pharmacy">
@@ -51,22 +26,20 @@
       <div><h1>Pharmacy Bills</h1></div>
       <div>
         <a href="{% url 'generatebill' %}">
-          <button>+Generate a Bill</button>
+          <button class="generateBillBtn">+Generate a Bill</button>
         </a>
-        <a href="{% url 'medicinesearch' %}"><button>Medicines</button></a>
+        <a href="{% url 'medicinesearch' %}"><button class="generateMedicineBtn">Medicines</button></a>
       </div>
     </div>
 
     <div class="pharmacysearch">
-      <div>
 
+      <div class="pharmacyInputOne">
         <label>Search drug</label>
-        <input type="text" placeholer="Searct a bill" />
-
+        <input class="searchBillInput" type="text" placeholder="Search a bill" />
       </div>
 
-      <div>
-       
+      <div class="pharmacyInputTwo">     
 
         <!-- Per page selector -->
         <form method="GET" style="display: inline;">

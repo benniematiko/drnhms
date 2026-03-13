@@ -3,49 +3,9 @@
 {% block title %}Dashboard{% endblock %} 
 {% block content %}
 
+<!-- Side bar here  -->
 
-
-<aside class="sidebar">
-  <ul>
-    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li><a href="{% url 'billings' %}">Billing</a></li>
-    <li><a href="#">Appointments</a></li>
-    <li><a href="#">OPD - Out Patient</a></li>
-    <li><a href="#">IPD - In Patient</a></li>
-    <li><a href="{% url 'pharmacy' %}">Pharmacy</a></li>
-    <li><a href="#">Laboratory</a></li>
-    <li><a href="#">Radiology</a></li>
-    <li><a href="#">Blood Bank</a></li>
-    <li><a href="#">Ambulance</a></li>
-    <li><a href="#">Front Office</a></li>
-
-
-
-    <li><a href="#">Birth & Death Record</a></li>
-    <li><a href="#">Human Resourc</a></li>
-    <li><a href="#">Duty Roster</a></li>
-    <li><a href="#">Annual Calendar</a></li>
-    <li><a href="#">Referrals</a></li>
-    <li><a href="#">Insurance Management</a></li>
-    <li><a href="#">Finance</a></li>
-    <li><a href="#">Messaging</a></li>
-    <li><a href="#">Inventory</a></li>
-    <li><a href="#">Download Center</a></li>
-
-
-    <li><a href="#">Certificate</a></li>
-    <li><a href="#">Front CMS</a></li>
-    <li><a href="#">Live Consultation</a></li>
-    <li><a href="#">Reports</a></li>
-    <li><a href="#">Setup</a></li>
-
-
-
-
-
-  </ul>
-</aside>
-
+{% include "sidebar.html" %}
 <main class="content">
   <div class="cards">
 
@@ -53,60 +13,227 @@
     <a href="">
       <div class="card">
         <div>OPD Income</div>
-        <div>Kshs 120.00 </div>
+        <div><p><strong id="opd-income">Kshs {{ opd_income|floatformat:2|intcomma }}</strong></p>
+       </div>
       </div>
     </a>
 
     
     <a href=""><div class="card">
       <div>IPD Income</div>
-      <div>120</div>
+      <div>
+        <p><strong id="ipd-income">Kshs {{ ipd_income|floatformat:2|intcomma }}</strong></p>
+
+      </div>
     </div></a>
 
     
-    <a href="{% url 'pharmacy' %}"><div class="card">
+    <a href="{% url 'pharmacy' %}">
+      <div class="card">
       <div>Pharmacy Income</div>
-      <div><strong>Kshs {{ pharmacy_income|floatformat:2|intcomma }}</strong></div>
-    </div></a>
+      <div>
+        <p><strong id="pharmacy-income">Kshs {{ pharmacy_income|floatformat:2|intcomma }}</strong></p>
+      </div>
+     </div>
+    </a>
 
     
     <a href=""><div class="card">
       <div>Laboratory Income</div>
-      <div>48</div>
+      <div>
+        <p><strong id="laboratory-income">Kshs {{ laboratory_income|floatformat:2|intcomma }}</strong></p>
+      </div>
     </div></a>
 
     
     <a href=""><div class="card">
       <div>Radiology Income</div>
-      <div>$12,500</div>
+      <div>  <p><strong id="radiology-income">Kshs {{ radiology_income|floatformat:2|intcomma }}</strong></p>
+      </div>
     </div></a>
 
     
     <a href=""><div class="card">
       <div>Blood Bank Income</div>
 
-      <div>$12,500</div>
+      <div> <p><strong id="blood-bank">Kshs {{ blood_income|floatformat:2|intcomma }}</strong></p>
+      </div>
     </div></a>
 
     
     <a href=""><div class="card">
       <div>Ambulance Income</div>
-      <div>$12,500</div>
+      <div><p><strong id="ambulance-income">Kshs {{ ambulance_income|floatformat:2|intcomma }}</strong></p>
+      </div>
     </div></a>
 
     
     <a href=""><div class="card">
       <div>General Income</div>
 
-      <div>$12,500</div>
+      <div><p><strong id="general-income">Kshs {{ general_income|floatformat:2|intcomma }}</strong></p>
+      </div>
     </div></a>
     
     <a href=""><div class="card">
-      <div>Exdivenses</div>
+      <div>Expenses</div>
 
-      <div>500</div>
-    </div></a>
+      <div>  <p><strong id="expenses-income">Kshs {{ expenses|floatformat:2|intcomma }}</strong></p>
+      </div>
+    </div>
+  </a>
+
   </div>
 </main>
+
+<!-- Add this at the bottom of your dashboard.html, before the endblock -->
+
+<script>
+function refreshDashboardTotals() {
+    fetch("{% url 'dashboard_totals' %}")
+        .then(response => response.json())
+        .then(data => {
+            // Update OPD income
+            const opdElement = document.getElementById('opd-income');
+            if (opdElement) {
+                opdElement.textContent = 'Kshs ' + data.opd_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update IPD income
+            const ipdElement = document.getElementById('ipd-income');
+            if (ipdElement) {
+                ipdElement.textContent = 'Kshs ' + data.ipd_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Pharmacy income
+            const pharmacyElement = document.getElementById('pharmacy-income');
+            if (pharmacyElement) {
+                pharmacyElement.textContent = 'Kshs ' + data.pharmacy_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Laboratory income
+            const labElement = document.getElementById('laboratory-income');
+            if (labElement) {
+                labElement.textContent = 'Kshs ' + data.laboratory_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Radiology income
+            const radElement = document.getElementById('radiology-income');
+            if (radElement) {
+                radElement.textContent = 'Kshs ' + data.radiology_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Blood Bank income
+            const bloodElement = document.getElementById('blood-bank');
+            if (bloodElement) {
+                bloodElement.textContent = 'Kshs ' + data.blood_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Ambulance income
+            const ambElement = document.getElementById('ambulance-income');
+            if (ambElement) {
+                ambElement.textContent = 'Kshs ' + data.ambulance_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update General income
+            const genElement = document.getElementById('general-income');
+            if (genElement) {
+                genElement.textContent = 'Kshs ' + data.general_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update Expenses
+            const expElement = document.getElementById('expenses-income');
+            if (expElement) {
+                expElement.textContent = 'Kshs ' + data.expenses.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Update appointments (if you have these elements)
+            const appointmentsElement = document.getElementById('total-appointments');
+            if (appointmentsElement) {
+                appointmentsElement.textContent = data.total_appointments;
+            }
+            
+            // Update patients
+            const patientsElement = document.getElementById('total-patients');
+            if (patientsElement) {
+                patientsElement.textContent = data.total_patients;
+            }
+            
+            // Update payments
+            const paymentsElement = document.getElementById('total-payments');
+            if (paymentsElement) {
+                paymentsElement.textContent = 'Kshs ' + data.total_payments.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+        })
+        .catch(error => console.error('Error refreshing dashboard:', error));
+}
+
+// Check if a new bill was saved (from generatebill page)
+function checkForNewBill() {
+    if (sessionStorage.getItem('bill_saved') === 'true') {
+        console.log('New bill detected, refreshing dashboard...');
+        
+        // Refresh immediately
+        refreshDashboardTotals();
+        
+        // Show a subtle notification (optional)
+        const lastInvoice = sessionStorage.getItem('last_invoice');
+        if (lastInvoice) {
+            // You can add a toast notification here if you want
+            console.log(`Bill ${lastInvoice} was just saved`);
+            
+            // Optional: Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = '#4CAF50';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.zIndex = '9999';
+            notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            notification.innerHTML = `New bill ${lastInvoice} saved! Dashboard updated.`;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Clear the flags
+        sessionStorage.removeItem('bill_saved');
+        sessionStorage.removeItem('last_invoice');
+    }
+}
+
+// Refresh every 30 seconds
+setInterval(refreshDashboardTotals, 30000);
+
+// Also refresh when page gains focus
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        refreshDashboardTotals();
+    }
+});
+
+// Initial refresh after page loads
+document.addEventListener('DOMContentLoaded', function() {
+    refreshDashboardTotals();
+    // Check for new bill that might have been saved
+    checkForNewBill();
+});
+
+// Also check when the page is shown (for back/forward navigation)
+window.addEventListener('pageshow', function(event) {
+    // Check if the page was loaded from cache
+    if (event.persisted) {
+        refreshDashboardTotals();
+        checkForNewBill();
+    }
+});
+</script>
 
 {% endblock %}

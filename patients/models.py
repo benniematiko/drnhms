@@ -37,6 +37,18 @@ class Patient(models.Model):
     doctor = models.ForeignKey('doctors.Doctor', on_delete=models.CASCADE, null=True, blank=True)
     last_visit = models.DateTimeField(auto_now=True)      # Updates every time the record is saved
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+
+    # additional fields added in order to save data from popup modal
+
+    blood_group = models.CharField(max_length=10, blank=True)
+    marital_status = models.CharField(max_length=20, blank=True)
+    guardian_name = models.CharField(max_length=200, blank=True)
+    allergies = models.TextField(blank=True)
+    insurance_provider = models.CharField(max_length=100, blank=True)
+    insurance_id = models.CharField(max_length=100, blank=True)
+    national_id = models.CharField(max_length=50, blank=True)
+    remarks = models.TextField(blank=True)
+
     actiontaken = models.CharField(
         max_length=10,   # Long enough for the longest choice
         choices=ACTION_CHOICES,

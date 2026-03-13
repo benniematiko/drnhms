@@ -2,17 +2,30 @@
 {% block title %}Dashboard{% endblock %} 
 {% block content %}
 
+<!-- Messages  -->
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 
 <div class="generateBill">
   <form id="billForm">
     {% csrf_token %}
     <div class="medicineAddPatient">
 
-
-
       <div class="sectionPatientName">
-        <input type="text" id="patientName" name="patient_name" placeholder="Patient Name" autocomplete="off" />
-        <input type="hidden" id="patientId" name="patient_id" />
+        <input type="text" id="generatepatientName" 
+          name="generate_patientName" 
+          placeholder="Patient Name" autocomplete="off"
+          value="{{ patient_name }}" />
+        <input type="hidden" id="patientId" name="patient_id" value="{{ selected_patient.id|default:'' }}" />
         <div id="patientSuggestions" 
             style=" position: absolute;
                     background: white;
@@ -27,15 +40,12 @@
         ></div>
       </div> 
 
-
-
-
-
-      <div>
+      <div class="generateAddPatient">
         <button class="open_PatientModal" id="openPatientModal" type="button">+ Add Patient</button>
       </div>
 
-      <div>
+      <div class="generatePrescription">
+      
         <input type="text" id="prescriptionNo" name="prescription" placeholder="Prescription No"/>
         <span></span>
       </div>
@@ -58,7 +68,7 @@
         <div class="leftTopRow">
           <div class="billNo">            
             <strong><label for="generateBillNo">Bill No:</label></strong> 
-            <span id="generateBillNo" class="text-primary">Generating...</span>            
+            <span id="generateBillNo" class="text-primary"> Generating... </span>            
           </div>
           <div class="caseId">
             <strong><label for="generateCaseId">Case ID:</label></strong> 
@@ -239,6 +249,7 @@
         <div class="SectionDoctorRowTwo">
           <div><label for="generateNote">Note</label></div>
           <textarea 
+            class="generateNote" 
             name="note" 
             id="generateNote"
             rows="4"
@@ -368,19 +379,28 @@
       initializeRow(firstRow);
     }
 
-    // 2. ADD ROW FUNCTIONALITY
+    // 2. ADD ROW FUNCTIONALITY - MODIFIED TO REMOVE LABELS
     addRowBtn.addEventListener("click", function (e) {
       e.preventDefault();
       const templateRow = document.querySelector(".medicineRow");
       const newRow = templateRow.cloneNode(true);
 
+      // Remove all label elements from the new row
+      newRow.querySelectorAll("label").forEach(label => label.remove());
+      
+      // Clear all input values
       newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+      
+      // Reset all selects
       newRow.querySelectorAll("select").forEach((select) => {
         select.selectedIndex = 0;
-        if (select.id === 'generateMedicineName' || select.classList.contains('generate_MedicineName')) {
+        
+        // Reset medicine select to default option
+        if (select.classList.contains('generate_MedicineName')) {
           select.innerHTML = '<option value="">--Select Medicine--</option>';
         }
-        if (select.id === 'generateBatchNumber' || select.classList.contains('generate_BatchNumber')) {
+        // Reset batch select to default option
+        if (select.classList.contains('generate_BatchNumber')) {
           select.innerHTML = '<option value="">--Select Batch--</option>';
         }
       });
@@ -392,7 +412,7 @@
 
     // 3. DELETE ROW
     container.addEventListener("click", function (e) {
-      if (e.target.id === 'deleteRowBtn' || e.target.classList.contains('delete_RowBtn')) {
+      if (e.target.classList.contains('delete_RowBtn')) {
         e.preventDefault();
         const rows = document.querySelectorAll(".medicineRow");
         if (rows.length > 1) {
@@ -406,15 +426,15 @@
 
     // 4. ROW INITIALIZATION LOGIC
     function initializeRow(row) {
-      const categorySelect = row.querySelector("#generateMedicineCategory, .generate_MedicineCategory");
-      const medicineSelect = row.querySelector("#generateMedicineName, .generate_MedicineName");
-      const batchSelect = row.querySelector("#generateBatchNumber, .generate_BatchNumber");
-      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
-      const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
-      const expiryDateInput = row.querySelector("#generateExpiryDate, .generate_ExpiryDate");
-      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
-      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
-      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+      const categorySelect = row.querySelector(".generate_MedicineCategory");
+      const medicineSelect = row.querySelector(".generate_MedicineName");
+      const batchSelect = row.querySelector(".generate_BatchNumber");
+      const quantityInput = row.querySelector(".generate_Quantity");
+      const availableQtyInput = row.querySelector(".generate_AvailableQty");
+      const expiryDateInput = row.querySelector(".generate_ExpiryDate");
+      const salesPriceInput = row.querySelector(".generate_MedicineSalesPrice");
+      const taxInput = row.querySelector(".generate_SalesTax");
+      const amountInput = row.querySelector(".generate_MedicineAmount");
 
       // Category change event
       categorySelect.addEventListener("change", function () {
@@ -424,8 +444,6 @@
         clearBatchDetails(row);
         
         if (categoryId) {
-          console.log('Fetching medicines for category:', categoryId);
-          
           fetch(`/pharmacy/get-medicines-by-category/${categoryId}/`)
             .then((res) => {
               if (!res.ok) {
@@ -434,8 +452,6 @@
               return res.json();
             })
             .then((data) => {
-              console.log('Medicines received:', data);
-              
               if (data.status === 'success' && data.medicines && data.medicines.length > 0) {
                 data.medicines.forEach((med) => {
                   const option = new Option(med.name, med.id);
@@ -459,8 +475,6 @@
         clearBatchDetails(row);
         
         if (medicineId) {
-          console.log('Fetching batches for medicine ID:', medicineId);
-          
           fetch(`/pharmacy/get-batches-by-medicine/?medicine_id=${medicineId}`)
             .then((res) => {
               if (!res.ok) {
@@ -469,8 +483,6 @@
               return res.json();
             })
             .then((data) => {
-              console.log('Batches received:', data);
-              
               if (data.status === 'success' && data.batches && data.batches.length > 0) {
                 data.batches.forEach((batch) => {
                   const opt = new Option(
@@ -502,6 +514,7 @@
           availableQtyInput.value = opt.dataset.availableQty || "";
           salesPriceInput.value = opt.dataset.salesPrice || "";
           
+          // Calculate tax (assuming 16% VAT)
           const price = parseFloat(opt.dataset.salesPrice) || 0;
           taxInput.value = (price * 0.16).toFixed(2);
           
@@ -528,26 +541,28 @@
 
     // 5. CALCULATION HELPERS
     function calculateAmount(row) {
-      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
-      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
-      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
-      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+      const quantityInput = row.querySelector(".generate_Quantity");
+      const salesPriceInput = row.querySelector(".generate_MedicineSalesPrice");
+      const taxInput = row.querySelector(".generate_SalesTax");
+      const amountInput = row.querySelector(".generate_MedicineAmount");
       
       const qty = parseFloat(quantityInput.value) || 0;
       const price = parseFloat(salesPriceInput.value) || 0;
       const tax = parseFloat(taxInput.value) || 0;
-      const total = qty * price + qty * tax;
+      
+      // Calculate total: (qty * price) + (qty * tax)
+      const total = (qty * price) + (qty * tax);
       
       amountInput.value = total > 0 ? total.toFixed(2) : "";
     }
 
     function clearBatchDetails(row) {
-      const expiryDateInput = row.querySelector("#generateExpiryDate, .generate_ExpiryDate");
-      const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
-      const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
-      const taxInput = row.querySelector("#generateSalesTax, .generate_SalesTax");
-      const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
-      const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
+      const expiryDateInput = row.querySelector(".generate_ExpiryDate");
+      const availableQtyInput = row.querySelector(".generate_AvailableQty");
+      const salesPriceInput = row.querySelector(".generate_MedicineSalesPrice");
+      const taxInput = row.querySelector(".generate_SalesTax");
+      const amountInput = row.querySelector(".generate_MedicineAmount");
+      const quantityInput = row.querySelector(".generate_Quantity");
       
       [expiryDateInput, availableQtyInput, salesPriceInput, taxInput, amountInput, quantityInput].forEach(
         (input) => {
@@ -558,12 +573,12 @@
       updateGrandTotal();
     }
 
-    // UPDATE GRAND TOTAL
+    // 6. UPDATE GRAND TOTAL
     function updateGrandTotal() {
       let grandTotal = 0;
       
       document.querySelectorAll(".medicineRow").forEach((row) => {
-        const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
+        const amountInput = row.querySelector(".generate_MedicineAmount");
         const amt = parseFloat(amountInput.value) || 0;
         grandTotal += amt;
       });
@@ -571,33 +586,43 @@
       const totalInput = document.getElementById("generateTotalAmount");
       if (totalInput) {
         totalInput.value = grandTotal.toFixed(2);
+        // Trigger discount calculation
         totalInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
 
-    // 6. DISCOUNT & NET TOTAL CALCULATION
-    const sectionDoctorRight = document.querySelector(".sectionDoctorRight");
-    
-    sectionDoctorRight.addEventListener("input", function () {
-      const totalVal = parseFloat(document.getElementById("generateTotalAmount").value) || 0;
-      const discPercent = parseFloat(document.getElementById("generateDiscountPercent").value) || 0;
-      const discAmountField = document.getElementById("generateDiscountAmount");
-      const taxField = document.getElementById("generateTaxAmount");
-      const netAmountField = document.getElementById("generateNetAmount");
-      const paymentAmountField = document.getElementById("generatePaymentAmount");
+    // 7. DISCOUNT & NET TOTAL CALCULATION
+    const discountPercentInput = document.getElementById("generateDiscountPercent");
+    const totalAmountInput = document.getElementById("generateTotalAmount");
+    const discountAmountInput = document.getElementById("generateDiscountAmount");
+    const taxAmountInput = document.getElementById("generateTaxAmount");
+    const netAmountInput = document.getElementById("generateNetAmount");
+    const paymentAmountInput = document.getElementById("generatePaymentAmount");
+
+    function calculateTotals() {
+      const totalVal = parseFloat(totalAmountInput.value) || 0;
+      const discPercent = parseFloat(discountPercentInput.value) || 0;
 
       const discAmount = totalVal * (discPercent / 100);
-      discAmountField.value = discAmount.toFixed(2);
+      discountAmountInput.value = discAmount.toFixed(2);
 
       const subtotal = totalVal - discAmount;
-      const taxAmount = parseFloat(taxField.value) || 0;
+      const taxAmount = parseFloat(taxAmountInput.value) || 0;
       const netAmount = subtotal + taxAmount;
 
-      netAmountField.value = netAmount.toFixed(2);
-      paymentAmountField.value = netAmount.toFixed(2);
-    });
+      netAmountInput.value = netAmount.toFixed(2);
+      paymentAmountInput.value = netAmount.toFixed(2);
+    }
 
-    // 7. SAVE TO DATABASE
+    if (discountPercentInput) {
+      discountPercentInput.addEventListener("input", calculateTotals);
+    }
+    
+    if (totalAmountInput) {
+      totalAmountInput.addEventListener("input", calculateTotals);
+    }
+
+    // 8. SAVE TO DATABASE - MODIFIED WITH SESSION STORAGE
     document.getElementById("saveBillBtn").addEventListener("click", function (e) {
       e.preventDefault();
 
@@ -606,12 +631,10 @@
       let isValid = true;
 
       document.querySelectorAll(".medicineRow").forEach((row, index) => {
-        const medicineSelect = row.querySelector("#generateMedicineName, .generate_MedicineName");
-        const batchSelect = row.querySelector("#generateBatchNumber, .generate_BatchNumber");
-        const quantityInput = row.querySelector("#generateQuantity, .generate_Quantity");
-        const salesPriceInput = row.querySelector("#generateMedicineSalesPrice, .generate_MedicineSalesPrice");
-        const amountInput = row.querySelector("#generateMedicineAmount, .generate_MedicineAmount");
-        const availableQtyInput = row.querySelector("#generateAvailableQty, .generate_AvailableQty");
+        const medicineSelect = row.querySelector(".generate_MedicineName");
+        const quantityInput = row.querySelector(".generate_Quantity");
+        const salesPriceInput = row.querySelector(".generate_MedicineSalesPrice");
+        const availableQtyInput = row.querySelector(".generate_AvailableQty");
 
         if (!medicineSelect || !quantityInput || !salesPriceInput) {
           console.warn(`Row ${index + 1}: Missing required elements`);
@@ -656,6 +679,18 @@
         return;
       }
 
+      const paymentMode = document.getElementById("generatePaymentMode").value;
+      if (!paymentMode) {
+        alert("Please select a payment mode");
+        return;
+      }
+
+      const paymentAmount = parseFloat(document.getElementById("generatePaymentAmount").value) || 0;
+      if (paymentAmount <= 0) {
+        alert("Please enter a valid payment amount");
+        return;
+      }
+
       // Prepare form data
       const formData = {
         patient_id: patientId,
@@ -666,12 +701,10 @@
         discount_amount: parseFloat(document.getElementById("generateDiscountAmount").value) || 0,
         tax_amount: parseFloat(document.getElementById("generateTaxAmount").value) || 0,
         net_amount: parseFloat(document.getElementById("generateNetAmount").value) || 0,
-        payment_mode: document.getElementById("generatePaymentMode").value || "",
-        payment_amount: parseFloat(document.getElementById("generatePaymentAmount").value) || 0,
+        payment_mode: paymentMode,
+        payment_amount: paymentAmount,
         medicines_data: JSON.stringify(medicineRows)
       };
-
-      console.log("Form Data:", formData);
 
       // Get CSRF token
       const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
@@ -681,7 +714,7 @@
       saveBtn.disabled = true;
       saveBtn.textContent = "Saving...";
 
-      // Send to backend using FormData (not JSON)
+      // Send to backend using FormData
       const form = new FormData();
       for (const key in formData) {
         form.append(key, formData[key]);
@@ -697,8 +730,16 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
+            // Store bill saved flag in sessionStorage for dashboard
+            sessionStorage.setItem('bill_saved', 'true');
+            sessionStorage.setItem('last_invoice', data.invoice_number);
+
+            // Show success message
+            
             alert("Bill saved successfully! Invoice: " + data.invoice_number);
+            // Redirect to pharmacy page where the flash message will be displayed
             window.location.href = "{% url 'pharmacy' %}";
+            
           } else {
             alert("Error: " + (data.error || "Unknown error"));
           }
@@ -713,76 +754,91 @@
         });
     });
 
-    // 8. PATIENT AUTOCOMPLETE
-    const patientInput = document.getElementById("patientName");
+    // 9. PATIENT AUTOCOMPLETE
+    const patientInput = document.getElementById("generatepatientName");
     const patientIdInput = document.getElementById("patientId");
     const suggestionsDiv = document.getElementById("patientSuggestions");
     let debounceTimer;
 
-    patientInput.addEventListener("input", function () {
-      clearTimeout(debounceTimer);
-      const query = this.value.trim();
+    if (patientInput) {
+      patientInput.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
 
-      if (query.length < 2) {
-        suggestionsDiv.style.display = "none";
-        patientIdInput.value = "";
-        return;
-      }
+        if (query.length < 2) {
+          suggestionsDiv.style.display = "none";
+          patientIdInput.value = "";
+          return;
+        }
 
-      debounceTimer = setTimeout(() => {
-        
-        // This tells Django to find the URL mapped to the name 'get_patients'
-        fetch("{% url 'get_patients' %}?q=" + encodeURIComponent(query))
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.length > 0) {
-              suggestionsDiv.innerHTML = data
-                .map(
-                  (patient) => `
-                    <div class="patient-suggestion" 
-                         data-id="${patient.id}" 
-                         data-name="${patient.name}"
-                         style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;">
-                        <strong>${patient.name}</strong> 
-                        <span style="color: #666;">(${patient.hospital_number})</span>
-                    </div>
-                `,
-                )
-                .join("");
-              suggestionsDiv.style.display = "block";
+        debounceTimer = setTimeout(() => {
+          fetch("{% url 'get_patients' %}?q=" + encodeURIComponent(query))
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.length > 0) {
+                suggestionsDiv.innerHTML = data
+                  .map(
+                    (patient) => `
+                      <div class="patient-suggestion" 
+                           data-id="${patient.id}" 
+                           data-name="${patient.name}"
+                           style="padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;">
+                          <strong>${patient.name}</strong> 
+                          <span style="color: #666;">(${patient.hospital_number})</span>
+                      </div>
+                  `
+                  )
+                  .join("");
+                suggestionsDiv.style.display = "block";
 
-              document.querySelectorAll(".patient-suggestion").forEach((item) => {
-                item.addEventListener("click", function () {
-                  patientInput.value = this.dataset.name;
-                  patientIdInput.value = this.dataset.id;
-                  suggestionsDiv.style.display = "none";
-                  console.log('Selected patient ID:', this.dataset.id);
+                document.querySelectorAll(".patient-suggestion").forEach((item) => {
+                  item.addEventListener("click", function () {
+                    patientInput.value = this.dataset.name;
+                    patientIdInput.value = this.dataset.id;
+                    suggestionsDiv.style.display = "none";
+                  });
+
+                  item.addEventListener("mouseenter", function () {
+                    this.style.backgroundColor = "#f0f0f0";
+                  });
+
+                  item.addEventListener("mouseleave", function () {
+                    this.style.backgroundColor = "white";
+                  });
                 });
+              } else {
+                suggestionsDiv.innerHTML = '<div style="padding: 10px; color: #999;">No patients found</div>';
+                suggestionsDiv.style.display = "block";
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching patients:", error);
+            });
+        }, 300);
+      });
 
-                item.addEventListener("mouseenter", function () {
-                  this.style.backgroundColor = "#f0f0f0";
-                });
+      document.addEventListener("click", function (e) {
+        if (e.target !== patientInput && !suggestionsDiv.contains(e.target)) {
+          suggestionsDiv.style.display = "none";
+        }
+      });
+    }
 
-                item.addEventListener("mouseleave", function () {
-                  this.style.backgroundColor = "white";
-                });
-              });
-            } else {
-              suggestionsDiv.innerHTML = '<div style="padding: 10px; color: #999;">No patients found</div>';
-              suggestionsDiv.style.display = "block";
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching patients:", error);
-          });
-      }, 300);
-    });
-
-    document.addEventListener("click", function (e) {
-      if (e.target !== patientInput && !suggestionsDiv.contains(e.target)) {
-        suggestionsDiv.style.display = "none";
-      }
-    });
+    // 10. Initialize datetime
+    const dateTimeInput = document.getElementById("generateDateTime");
+    if (dateTimeInput) {
+      const now = new Date();
+      const formattedDateTime = now.toLocaleString('en-KE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      dateTimeInput.value = formattedDateTime;
+    }
   });
 </script>
 
@@ -791,157 +847,148 @@
 
 <div id="generatePatientModal" class="generateModalOverlay">
   <div class="modal-content">
-    <div class="modal-header">
+    <div class="modal-header" style="background-color: #a80f1b; color: #fff;">
       <h3>Add New Patient</h3>
-      <span class="close-modal">&times;</span>
+      <span class="close-modal" style="color: #fff;">&times;</span>
     </div>
 
-    <form id="addPatientForm">
+    <!-- CHANGED: Using AJAX endpoint instead of regular form submission -->
+    <form method="POST" action="{% url 'add_patient_ajax' %}" id="addPatientForm" enctype="multipart/form-data">
+    
+      {% csrf_token %}
+      
       <div class="modal-body">
         <div class="patientNames">
           <div class="patientFullName">
-            <label>Patient's Full Name</label>
-            <input type="text" placeholder="Enter patient's full name" />
+            <label for="generatePatientNameModal">Patient's Full Name *</label>
+            <input type="text" name="patient_full_name" class="generate_PatientFullNameModal" id="generatePatientNameModal" 
+                   placeholder="Enter patient's full name" required />
           </div>
 
           <div class="guardianFullName">
-            <label>Guardian's Full Names</label>
-            <input type="text" placeholder="Enter guardian's full name" />
+            <label for="generateGuardianFullNameModal">Guardian's Full Names</label>
+            <input type="text" name="guardian_full_name" id="generateGuardianFullNameModal" placeholder="Enter guardian's full name" />
           </div>
         </div>
 
         <div class="genderRow">
           <div class="patientGender">
-            <div>Gender</div>
-            <select>
-              <option>--Select gender--</option>
-              <option>Male</option>
-              <option>Female</option>
+            <label for="generateGenderModal">Gender *</label>
+            <select name="gender" class="generate_GenderModal" id="generateGenderModal" required>
+              <option value="">--Select gender--</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
             </select>
           </div>
 
           <div class="patientdateOfBirth">
-            <div>Date of Birth</div>
-            <input type="date" />
+            <label for="generateBirthDateModal">Date of Birth *</label>
+            <input type="date" name="date_of_birth" id="generateBirthDateModal" required />
           </div>
 
           <div class="patientAge">
-            <div>Age (yy-mm-dd) *</div>
-            <div>
-              <div><input type="text" placeholder="Age" /></div>
-              <div><input type="text" placeholder="Month" /></div>
-              <div><input type="text" placeholder="Day" /></div>
+            <label>Age (yy-mm-dd)</label>
+            <div class="age-inputs" style="display: flex; gap: 5px;">
+              <div>
+                <input type="text" name="age_years" class="generate_PatientAgeModal" id="generatePatientAgeModal" placeholder="Years" readonly />
+              </div>
+              <div>
+                <input type="text" name="age_months" class="generate_PatientMonthModal" id="generatePatientMonthModal" placeholder="Months" readonly />
+              </div>
+              <div>
+                <input type="text" name="age_days" class="generate_PatientDayModal" id="generatePatientDayModal" placeholder="Days" readonly />
+              </div>
             </div>
           </div>
 
           <div class="patientBloodGroup">
-            <div>Blood Group</div>
-            <div>
-              <select>
-                <option>--Select Blood Group</option>
-                <option>O+</option>
-                <option>A+</option>
-                <option>B+</option>
-                <option>AB+</option>
-              </select>
-            </div>
+            <label for="generatePatientBloodGroup">Blood Group</label>
+            <select name="blood_group" class="generate_PatientBloodGroup" id="generatePatientBloodGroup">
+              <option value="">--Select Blood Group--</option>
+              <option value="O+">O+</option>
+              <option value="A+">A+</option>
+              <option value="B+">B+</option>
+              <option value="AB+">AB+</option>
+            </select>
           </div>
 
           <div class="patientMaritalStatus">
-            <div>Marital Status</div>
-            <div>
-              <select>
-                <option>--Select Marita Status</option>
-                <option>Single</option>
-                <option>Married</option>
-                <option>Widow</option>
-              </select>
-            </div>
+            <label for="generateMaritalStatus">Marital Status</label>
+            <select name="marital_status" class="generate_MaritalStatus" id="generateMaritalStatus">
+              <option value="">--Select Marital Status--</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Widow">Widow</option>
+            </select>
           </div>
 
           <div class="patientPhoto">
-            <div>Patient's Photo</div>
-            <input type="text" placeholder />
+            <label for="generatePatientPhoto">Patient's Photo</label>
+            <input type="file" name="patient_photo" class="generate_PatientPhoto" id="generatePatientPhoto" accept="image/*" />
           </div>
         </div>
 
         <div class="patientPhone">
           <div class="patientPhoneInput">
-            <div>Phone</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generatePhoneNumber">Phone Number</label>
+            <input type="text" name="phone_number" class="generate_PhoneNumber" id="generatePhoneNumber" />
           </div>
 
           <div class="patientEMailInput">
-            <div>Email</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generatePatientEmailModal">Email</label>
+            <input type="email" name="email" id="generatePatientEmailModal" />
           </div>
 
           <div class="patientAddressInput">
-            <div>Address</div>
-            <div><input type="text" /></div>
+            <label for="generatePatientAddressModal">Address</label>
+            <input type="text" name="address" id="generatePatientAddressModal" />
           </div>
         </div>
 
         <div class="patientRemarks">
           <div>
-            <div>Remarks</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generatePatientRemarksModal">Remarks</label>
+            <input type="text" name="remarks" class="generate_PatientRemarksModal" id="generatePatientRemarksModal" />
           </div>
 
           <div>
-            <div>Any known allergies</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generatePatientAllergeiesModal">Any known allergies</label>
+            <input type="text" name="allergies" class="generate_PatientAllergeiesModal" id="generatePatientAllergeiesModal" />
           </div>
         </div>
 
         <div class="patientInsurance">
           <div>
-            <div>
-              <div>Insurance</div>
-              <select>
-                <option>--Select Insurance--</option>
-                <option>SHA</option>
-                <option>Jubilee Medical</option>
-                <option>CIC Insurance</option>
-              </select>
-            </div>
+            <label for="generateInsuranceModal">Insurance</label>
+            <select name="insurance" class="generate_InsuranceModal" id="generateInsuranceModal">
+              <option value="">--Select Insurance--</option>
+              <option value="SHA">SHA</option>
+              <option value="Jubilee Medical">Jubilee Medical</option>
+              <option value="CIC Insurance">CIC Insurance</option>
+            </select>
           </div>
 
           <div>
-            <div>Insurance Id</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generateInsuranceIdModal">Insurance Id</label>
+            <input type="text" name="insurance_id" class="generateInsuranceIdModal" id="generateInsuranceIdModal" />
           </div>
 
           <div>
-            <div>Insurance Validity</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generateInsuranceValidity">Insurance Validity</label>
+            <input type="date" name="insurance_validity" class="generateInsuranceValidity" id="generateInsuranceValidity" />
           </div>
         </div>
 
         <div class="patientIdentification">
           <div>
-            <div>National Identification Number</div>
-            <div>
-              <input type="text" />
-            </div>
+            <label for="generateNationalIdModal">National Identification Number</label>
+            <input type="text" name="national_id" class="generate_NationalIdModal" id="generateNationalIdModal" />
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="generateCancelBtn">Cancel</button>
-          <button type="submit" class="generateSaveBtn">Save Patient</button>
+          <button type="button" class="generate_PatientCancelBtn" id="generatePatientCancelBtn">Cancel</button>
+          <button type="submit" class="generate_AddPatientSaveBtn" id="generatePatientSaveBtn">Save Patient</button>
         </div>
       </div>
     </form>
@@ -949,7 +996,7 @@
 </div>
 
 
-<!-- Add Patient floating page JS  -->
+<!-- Add Patient floating page JS with AJAX submission -->
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -957,12 +1004,14 @@ document.addEventListener("DOMContentLoaded", function() {
   const patientModal = document.getElementById('generatePatientModal');
   const openPatientModalBtn = document.getElementById('openPatientModal');
   const closeModalBtn = document.querySelector('.close-modal');
-  const cancelBtn = document.querySelector('.generateCancelBtn');
+  const cancelBtn = document.querySelector('.generate_PatientCancelBtn');
+  const patientForm = document.getElementById('addPatientForm');
+  const saveBtn = document.getElementById('generatePatientSaveBtn');
 
   // Open modal when button is clicked
   if (openPatientModalBtn) {
     openPatientModalBtn.addEventListener('click', function(e) {
-      e.preventDefault(); // Prevent any default button behavior
+      e.preventDefault();
       patientModal.style.display = 'flex';
     });
   }
@@ -982,7 +1031,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Close modal when clicking outside the modal content
+  // Close modal when clicking outside
   if (patientModal) {
     patientModal.addEventListener('click', function(e) {
       if (e.target === patientModal) {
@@ -990,8 +1039,175 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }
+
+  // AGE CALCULATION FUNCTIONALITY
+  const birthDateInput = document.getElementById('generateBirthDateModal');
+  const ageYearsInput = document.getElementById('generatePatientAgeModal');
+  const ageMonthsInput = document.getElementById('generatePatientMonthModal');
+  const ageDaysInput = document.getElementById('generatePatientDayModal');
+
+  if (birthDateInput) {
+    birthDateInput.addEventListener('change', function() {
+      calculateAge(this.value);
+    });
+    
+    birthDateInput.addEventListener('input', function() {
+      if (this.value) {
+        calculateAge(this.value);
+      }
+    });
+  }
+
+  function calculateAge(birthDateString) {
+    if (!birthDateString) {
+      ageYearsInput.value = '';
+      ageMonthsInput.value = '';
+      ageDaysInput.value = '';
+      return;
+    }
+
+    const birthDate = new Date(birthDateString);
+    const today = new Date();
+
+    if (isNaN(birthDate.getTime())) {
+      alert('Please enter a valid date');
+      return;
+    }
+
+    if (birthDate > today) {
+      alert('Birth date cannot be in the future');
+      birthDateInput.value = '';
+      ageYearsInput.value = '';
+      ageMonthsInput.value = '';
+      ageDaysInput.value = '';
+      return;
+    }
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days = lastMonth.getDate() + days;
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    if (years < 0) {
+      years = 0;
+      const diffTime = Math.abs(today - birthDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      years = 0;
+      months = Math.floor(diffDays / 30);
+      days = diffDays % 30;
+      
+      if (months >= 12) {
+        years = Math.floor(months / 12);
+        months = months % 12;
+      }
+    }
+
+    ageYearsInput.value = years;
+    ageMonthsInput.value = months;
+    ageDaysInput.value = days;
+  }
+
+  // AJAX FORM SUBMISSION
+  if (patientForm) {
+    patientForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validate required fields
+      const fullName = document.getElementById('generatePatientNameModal').value.trim();
+      const dob = document.getElementById('generateBirthDateModal').value;
+      const gender = document.getElementById('generateGenderModal').value;
+
+      if (!fullName || !dob || !gender) {
+        alert('Please fill in all required fields (Name, Date of Birth, and Gender)');
+        return;
+      }
+
+      // Create FormData object
+      const formData = new FormData(this);
+      
+      // Disable button and show loading
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+
+      // Get CSRF token
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      // Send AJAX request
+      fetch("{% url 'add_patient_ajax' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close modal
+          patientModal.style.display = 'none';
+          
+          // Set patient name and ID in the main form
+          document.getElementById('generatepatientName').value = data.patient.full_name;
+          document.getElementById('patientId').value = data.patient.id;
+          
+          // Show success message
+          alert(data.message);
+          
+          // Clear the form
+          patientForm.reset();
+          
+          // Clear age fields
+          ageYearsInput.value = '';
+          ageMonthsInput.value = '';
+          ageDaysInput.value = '';
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to save patient. Please try again.');
+      })
+      .finally(() => {
+        // Re-enable button
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Patient';
+      });
+    });
+  }
 });
 </script>
 
-{% endblock %}
+<!-- add a patient name to the patient ID field -->
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const patientName = "{{ patient_name }}";
+    
+    if (patientName) {
+        document.getElementById('generatepatientName').value = patientName;
+        
+        // Hide success message after 5 seconds
+        setTimeout(function() {
+            const alertDiv = document.querySelector('.alert');
+            if (alertDiv) {
+                alertDiv.style.display = 'none';
+            }
+        }, 5000);
+    }
+});
+</script>
+
+
+{% endblock %}

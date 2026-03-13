@@ -39,11 +39,11 @@ class DrugGroup(models.Model):
 # ✅ MOVED Drug class HERE - before DrugPurchase and DrugStockAdjustment
 class Drug(models.Model):
     UNIT_CHOICES = (
-        ('Tablet', 'Tablet'),
-        ('Capsule', 'Capsule'),
-        ('Syrup', 'Syrup'),
-        ('Injection', 'Injection'),
-        ('Cream', 'Cream'),
+        ('Grams', 'Grams'),
+        ('ML', 'ML'),
+        ('MG', 'MG'),
+        ('%', '%'),
+        
     )
 
     name = models.CharField(max_length=150)

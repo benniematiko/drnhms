@@ -169,28 +169,58 @@ def generatebill(request):
                     'invoice_number': invoice_number,
                     'message': 'Bill saved successfully!'
                 })
+        except Exception as e:            
+            messages.error(request, f'Error creating bill: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
         
-        except Patient.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Patient not found'}, status=400)
-        except Doctor.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Doctor not found'}, status=400)
-        except Drug.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Medicine not found'}, status=400)
-        except ValueError as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Error: {str(e)}'}, status=500)
+        # except Patient.DoesNotExist:
+        #     return JsonResponse({'success': False, 'error': 'Patient not found'}, status=400)
+        # except Doctor.DoesNotExist:
+        #     return JsonResponse({'success': False, 'error': 'Doctor not found'}, status=400)
+        # except Drug.DoesNotExist:
+        #     return JsonResponse({'success': False, 'error': 'Medicine not found'}, status=400)
+        # except ValueError as e:
+        #     return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        # except Exception as e:
+        #     return JsonResponse({'success': False, 'error': f'Error: {str(e)}'}, status=500)
     
     # GET request - show form
+    # ✅ NEW: Get patient info from URL parameters if available
+    patient_id = request.GET.get('patient_id')
+    patient_name = request.GET.get('patient_name', '')
+
     categories = DrugCategory.objects.all()
     doctors = Doctor.objects.filter(status__in=['Employed', 'Full-Time']).order_by('last_name', 'first_name')
-    
+
+    # categories = DrugCategory.objects.all()
+    # doctors = Doctor.objects.filter(status__in=['Employed', 'Full-Time']).order_by('last_name', 'first_name')
+
+    # ✅ NEW: If patient_id is provided, get the full patient object
+    selected_patient = None
+    if patient_id:
+        try:
+            selected_patient = Patient.objects.get(id=patient_id)
+            patient_name = selected_patient.full_name
+        except Patient.DoesNotExist:
+            pass
+
     context = {
         'categories': categories,
-        'doctors': doctors
+        'doctors': doctors,
+        'selected_patient': selected_patient,  # ✅ NEW
+        'patient_name': patient_name,  # ✅ NEW
     }
-    
+
     return render(request, 'pharmacy/generatebill.html', context)
+
+
+    
+    # context = {
+    #     'categories': categories,
+    #     'doctors': doctors
+    # }
+    
+    # return render(request, 'pharmacy/generatebill.html', context)
 
 
 @login_required
@@ -548,5 +578,180 @@ def save_medicine_purchase(request):
 
 
 
+# Save data from generateBill pop up modal view
 
 
+@login_required
+
+def add_patient_from_bill(request):
+    """Handle patient creation from the generate bill modal"""
+    if request.method == 'POST':
+        try:
+            # Get form data
+            full_name = request.POST.get('patient_full_name', '').strip()
+            
+            # Split full name into first and last name
+            name_parts = full_name.split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            # Get all other fields
+            gender = request.POST.get('gender')
+            date_of_birth = request.POST.get('date_of_birth')
+            guardian_name = request.POST.get('guardian_full_name', '')
+            phone = request.POST.get('phone_number', '')
+            email = request.POST.get('email', '')
+            address = request.POST.get('address', '')
+            blood_group = request.POST.get('blood_group', '')
+            marital_status = request.POST.get('marital_status', '')
+            allergies = request.POST.get('allergies', '')
+            insurance_provider = request.POST.get('insurance', '')
+            insurance_id = request.POST.get('insurance_id', '')
+            national_id = request.POST.get('national_id', '')
+            remarks = request.POST.get('remarks', '')
+            
+            # Validate required fields
+            if not all([first_name, gender, date_of_birth]):
+                messages.error(request, 'Please fill in all required fields (Name, Gender, Date of Birth)')
+                return redirect('generatebill')
+            
+            # Generate unique hospital number
+            last_patient = Patient.objects.order_by('-created_at').first()
+            if last_patient and last_patient.hospital_number:
+                try:
+                    # Extract number part (assuming format like "PAT-000001")
+                    last_num = int(last_patient.hospital_number.split('-')[-1])
+                    new_num = last_num + 1
+                except:
+                    new_num = 1
+            else:
+                new_num = 1
+            
+            hospital_number = f"PAT-{new_num:06d}"
+            
+            # Create the patient with all fields
+            patient = Patient.objects.create(
+                hospital_number=hospital_number,
+                first_name=first_name,
+                last_name=last_name,
+                gender=gender,
+                date_of_birth=date_of_birth,
+                guardian_name=guardian_name,
+                phone=phone,
+                email=email,
+                address=address,
+                blood_group=blood_group,
+                marital_status=marital_status,
+                allergies=allergies,
+                insurance_provider=insurance_provider,
+                insurance_id=insurance_id,
+                national_id=national_id,
+                remarks=remarks,
+                status='Pending'  # Default status
+            )
+            
+            # Success message
+            messages.success(request, f'Patient {patient.full_name} added successfully!')
+            
+            # Redirect back to generate bill with the new patient selected
+            return redirect(f'/pharmacy/pharmacy/generatebill/?patient_id={patient.id}&patient_name={patient.full_name}')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating patient: {str(e)}')
+            return redirect('generatebill')
+    
+    return redirect('generatebill')
+
+
+
+@login_required
+@login_required
+def add_patient_ajax(request):
+    """AJAX version - returns JSON response without page reload"""
+    if request.method == 'POST':
+        try:
+            # Get form data
+            full_name = request.POST.get('patient_full_name', '').strip()
+            
+            # Split full name
+            name_parts = full_name.split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            # Get all other fields
+            gender = request.POST.get('gender')
+            date_of_birth = request.POST.get('date_of_birth')
+            guardian_name = request.POST.get('guardian_full_name', '')
+            phone = request.POST.get('phone_number', '')
+            email = request.POST.get('email', '')
+            address = request.POST.get('address', '')
+            blood_group = request.POST.get('blood_group', '')
+            marital_status = request.POST.get('marital_status', '')
+            allergies = request.POST.get('allergies', '')
+            insurance_provider = request.POST.get('insurance', '')
+            insurance_id = request.POST.get('insurance_id', '')
+            national_id = request.POST.get('national_id', '')
+            remarks = request.POST.get('remarks', '')
+            
+            # Validate required fields
+            if not all([first_name, gender, date_of_birth]):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Please fill in all required fields (Name, Gender, Date of Birth)'
+                }, status=400)
+            
+            # Generate unique hospital number
+            last_patient = Patient.objects.order_by('-created_at').first()
+            if last_patient and last_patient.hospital_number:
+                try:
+                    last_num = int(last_patient.hospital_number.split('-')[-1])
+                    new_num = last_num + 1
+                except:
+                    new_num = 1
+            else:
+                new_num = 1
+            
+            hospital_number = f"PAT-{new_num:06d}"
+            
+            # Create the patient
+            patient = Patient.objects.create(
+                hospital_number=hospital_number,
+                first_name=first_name,
+                last_name=last_name,
+                gender=gender,
+                date_of_birth=date_of_birth,
+                guardian_name=guardian_name,
+                phone=phone,
+                email=email,
+                address=address,
+                blood_group=blood_group,
+                marital_status=marital_status,
+                allergies=allergies,
+                insurance_provider=insurance_provider,
+                insurance_id=insurance_id,
+                national_id=national_id,
+                remarks=remarks,
+                status='Pending'
+            )
+            
+            # Return success response with patient data
+            return JsonResponse({
+                'success': True,
+                'message': f'Patient {patient.full_name} added successfully!',
+                'patient': {
+                    'id': str(patient.id),
+                    'full_name': patient.full_name,
+                    'hospital_number': patient.hospital_number
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error creating patient: {str(e)}'
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    }, status=405)
