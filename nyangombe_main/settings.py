@@ -131,6 +131,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Tell Django where to find global static files
 STATICFILES_DIRS = [
@@ -143,7 +145,7 @@ LOGIN_URL = 'login'
 # Redirect after successful login
 LOGIN_REDIRECT_URL = 'dashboard'  # goes to /dashboard/
 
-
+  
 # Redirect after logout
 LOGOUT_REDIRECT_URL = 'login'     # usually back to login page
 
