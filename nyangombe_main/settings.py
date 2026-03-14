@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,7 +138,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Tell Django where to find global static files
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # If you have a top-level /static/ folder
-    BASE_DIR / 'nyangombe_main' / 'static',
+    
 ]
 
 # Media files (User-uploaded files)
