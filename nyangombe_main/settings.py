@@ -132,12 +132,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # The absolute path to the directory where collectstatic will collect static files for deployment.
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Tell Django where to find global static files
 STATICFILES_DIRS = [
-    'nyangombe_main/static',
+    BASE_DIR / 'static',  # If you have a top-level /static/ folder
+    BASE_DIR / 'nyangombe_main' / 'static',
 ]
+
+# Media files (User-uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Redirect after login if not specifying next
 LOGIN_URL = 'login'
