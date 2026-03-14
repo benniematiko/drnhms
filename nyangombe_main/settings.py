@@ -138,6 +138,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Tell Django where to find global static files
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # If you have a top-level /static/ folder
+    BASE_DIR / 'nyangombe_main' / 'static',
     
 ]
 
